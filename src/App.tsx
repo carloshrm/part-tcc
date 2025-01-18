@@ -1,13 +1,15 @@
-import './App.css'
+import { ThemeProvider } from "styled-components";
+import Home from "./components/Home";
+import { theme } from "./components/style/theme";
 
 function App() {
-
-  return (
-    <>
-      <h1>test</h1>
-
-    </>
-  )
+    return (
+        <div>
+            <ThemeProvider theme={theme}>
+                <Home />
+            </ThemeProvider>
+        </div>
+    );
 }
 
-export default App
+export default App;
