@@ -10,11 +10,9 @@ import {
 } from "vexflow";
 
 import * as S from "./styles";
-
-export enum Clef {
-  Treble = "treble",
-  Bass = "bass",
-}
+import ClefSelector from "./ClefSelector";
+import { useAppSelector } from "../../context/hooks";
+import { getAllMusicData } from "../../context/MusicData/musicDataSlice";
 
 const defaultFontSettings: FontInfo = {
   family: "Arial",
@@ -23,13 +21,10 @@ const defaultFontSettings: FontInfo = {
   style: "",
 };
 
-const defaultStave: Stave = new Stave(10, 0, 500);
-
 function SheetMusic() {
   const vexFlow = useMemo(() => Vex.Flow, []);
   const containerRef = React.useRef<HTMLCanvasElement>(null);
-
-  const [clef, setClef] = useState<string>(Clef.Treble);
+  const musicData = useAppSelector(getAllMusicData);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -43,8 +38,8 @@ function SheetMusic() {
     const context = renderer.getContext();
     context.setFont(defaultFontSettings);
 
-    const stave = Object.assign({}, defaultStave);
-    stave.addClef(clef).addTimeSignature("4/4"); // move params to context
+    const stave = new Stave(10, 0, 400);
+    stave.addClef(musicData.clef).addTimeSignature("4/4"); // move params to context
     stave.setContext(context).draw();
 
     // const notes = [
@@ -69,34 +64,12 @@ function SheetMusic() {
     // Formatter.FormatAndDraw(context, stave, notes);
   }, [clef]);
 
-  const handleClefChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setClef(e.target.value);
-  };
-
   return (
     <S.Container>
       <h3>Sheet Music</h3>
       <input type="text" name="notes" id="notes" />
-      <div>
-        <input
-          type="radio"
-          name="clef"
-          id="treble-clef"
-          value="treble"
-          onChange={handleClefChange}
-          checked={clef === "treble"}
-        />
-        <label htmlFor="treble-clef">Treble</label>
-        <input
-          type="radio"
-          name="clef"
-          id="bass-clef"
-          value="bass"
-          onChange={handleClefChange}
-          checked={clef === "bass"}
-        />
-        <label htmlFor="bass-clef">Bass</label>
-      </div>
+      <ClefSelector />
+      <div></div>
 
       <S.SheetCanvas ref={containerRef} />
     </S.Container>
