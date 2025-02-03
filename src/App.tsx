@@ -1,6 +1,6 @@
 import { ThemeProvider } from "styled-components";
 import Home from "./components/Home";
-import { theme } from "./components/style/theme";
+import { theme } from "./style/theme";
 
 function App() {
     return (
