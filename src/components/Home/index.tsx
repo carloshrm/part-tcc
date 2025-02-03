@@ -1,10 +1,12 @@
-import * as S from './styles';
+import SheetMusic from "../SheetMusic";
+import * as S from "./styles";
 
 function Home() {
   return (
-    <div>
+    <>
       <S.Title>Home</S.Title>
-    </div>
+      <SheetMusic />
+    </>
   );
 }
 
