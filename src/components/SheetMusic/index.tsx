@@ -11,8 +11,9 @@ import {
 
 import * as S from "./styles";
 import ClefSelector from "./ClefSelector";
-import { useAppSelector } from "../../context/hooks";
-import { getAllMusicData } from "../../context/MusicData/musicDataSlice";
+import { useAppSelector } from "@/context/hooks";
+import { getAllMusicData } from "@/context/MusicData/musicDataSlice";
+import TimeSignatureSelector from "./TimeSignatureSelector";
 
 const defaultFontSettings: FontInfo = {
   family: "Arial",
@@ -39,7 +40,7 @@ function SheetMusic() {
     context.setFont(defaultFontSettings);
 
     const stave = new Stave(10, 0, 400);
-    stave.addClef(musicData.clef).addTimeSignature("4/4"); // move params to context
+    stave.addClef(musicData.clef).addTimeSignature("3/5"); // move params to context
     stave.setContext(context).draw();
 
     // const notes = [
@@ -62,13 +63,14 @@ function SheetMusic() {
     // ];
 
     // Formatter.FormatAndDraw(context, stave, notes);
-  }, [clef]);
+  }, [musicData]);
 
   return (
     <S.Container>
       <h3>Sheet Music</h3>
       <input type="text" name="notes" id="notes" />
       <ClefSelector />
+      <TimeSignatureSelector />
       <div></div>
 
       <S.SheetCanvas ref={containerRef} />

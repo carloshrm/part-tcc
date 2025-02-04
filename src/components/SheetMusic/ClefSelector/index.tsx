@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector } from "../../../context/hooks";
-import { Clef } from "../../../context/MusicData/types";
-import { setClef, getClef } from "../../../context/MusicData/musicDataSlice";
+import { useAppDispatch, useAppSelector } from "@/context/hooks";
+import { Clef } from "@/context/MusicData/types";
+import { setClef, getClef } from "@/context/MusicData/musicDataSlice";
 import * as S from "./styles";
 
 const ClefSelector = () => {
