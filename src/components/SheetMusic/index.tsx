@@ -1,19 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Vex,
-  Stave,
-  StaveNote,
-  Formatter,
-  Renderer,
-  Clef as VexClef,
-  FontInfo,
-} from "vexflow";
+import { Vex, Stave, StaveNote, Formatter, Renderer, Clef as VexClef, FontInfo, Voice, RenderContext } from "vexflow";
 
 import * as S from "./styles";
 import ClefSelector from "./ClefSelector";
 import { useAppSelector } from "@/context/hooks";
 import { getAllMusicData } from "@/context/MusicData/musicDataSlice";
 import TimeSignatureSelector from "./TimeSignatureSelector";
+import useUtils from "@/utils/useUtils";
+import { Clef, Note } from "@/context/MusicData/types";
 
 const defaultFontSettings: FontInfo = {
   family: "Arial",
@@ -22,45 +16,60 @@ const defaultFontSettings: FontInfo = {
   style: "",
 };
 
+const defaultStaveSettings = {
+  width: 300,
+  widthOffset: 10,
+  heightOffset: 20,
+};
+
 function SheetMusic() {
-  const vexFlow = useMemo(() => Vex.Flow, []);
+  const { timeSignatureToString, mapNotesToVexflow } = useUtils();
   const containerRef = React.useRef<HTMLCanvasElement>(null);
   const musicData = useAppSelector(getAllMusicData);
 
+  const calcWidth = (measures: Note[][]) => {};
+
   useEffect(() => {
     if (!containerRef.current) return;
+    const vexFlow = new Vex.Flow.Factory({
+      renderer: {
+        elementId: containerRef.current.id,
+        width: window.innerWidth * 0.8,
+        height: window.innerHeight * 0.8,
+        backend: Vex.Flow.Renderer.Backends.CANVAS,
+      },
+      font: defaultFontSettings,
+    });
 
-    const renderer = new vexFlow.Renderer(
-      containerRef.current,
-      vexFlow.Renderer.Backends.CANVAS,
-    );
+    const context = vexFlow.getContext();
 
-    renderer.resize(window.innerWidth * 0.6, window.innerHeight * 0.8);
-    const context = renderer.getContext();
-    context.setFont(defaultFontSettings);
+    let isFirstMeasure = true;
+    for (let i = 0; i < musicData.measures.length; i++) {
+      const currentStave = new Stave(
+        defaultStaveSettings.widthOffset + i * defaultStaveSettings.width,
+        i * 80,
+        defaultStaveSettings.width,
+      );
 
-    const stave = new Stave(10, 0, 400);
-    stave.addClef(musicData.clef).addTimeSignature("3/5"); // move params to context
-    stave.setContext(context).draw();
+      if (isFirstMeasure) {
+        currentStave.addClef(musicData.clef);
+        currentStave.addTimeSignature(timeSignatureToString(musicData.timeSignature));
+        isFirstMeasure = false;
+      }
+      currentStave.setContext(context).draw();
 
-    // const notes = [
-    //   new StaveNote({
-    //     keys: ["c/4"],
-    //     duration: "q",
-    //   }),
-    //   new StaveNote({
-    //     keys: ["d/4"],
-    //     duration: "q",
-    //   }),
-    //   new StaveNote({
-    //     keys: ["e/4"],
-    //     duration: "q",
-    //   }),
-    //   new StaveNote({
-    //     keys: ["f/4"],
-    //     duration: "q",
-    //   }),
-    // ];
+      const notes = Object.groupBy(musicData.measures[i], (note) => note.voice);
+      for (const voice in notes) {
+        const newVoice = new Voice({
+          num_beats: musicData.timeSignature.beats,
+          beat_value: musicData.timeSignature.value,
+        });
+
+        const currentNotes = mapNotesToVexflow(notes[voice]);
+        newVoice.addTickables(currentNotes);
+        Formatter.FormatAndDraw(context, currentStave, currentNotes);
+      }
+    }
 
     // Formatter.FormatAndDraw(context, stave, notes);
   }, [musicData]);
@@ -73,7 +82,7 @@ function SheetMusic() {
       <TimeSignatureSelector />
       <div></div>
 
-      <S.SheetCanvas ref={containerRef} />
+      <S.SheetCanvas ref={containerRef} id="render-canvas" />
     </S.Container>
   );
 }
