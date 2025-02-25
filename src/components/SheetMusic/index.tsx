@@ -27,8 +27,6 @@ function SheetMusic() {
   const containerRef = React.useRef<HTMLCanvasElement>(null);
   const musicData = useAppSelector(getAllMusicData);
 
-  const calcWidth = (measures: Note[][]) => {};
-
   useEffect(() => {
     if (!containerRef.current) return;
     const vexFlow = new Vex.Flow.Factory({
@@ -42,36 +40,55 @@ function SheetMusic() {
     });
 
     const context = vexFlow.getContext();
+    context.setFont({ ...defaultFontSettings });
 
-    let isFirstMeasure = true;
-    for (let i = 0; i < musicData.measures.length; i++) {
-      const currentStave = new Stave(
-        defaultStaveSettings.widthOffset + i * defaultStaveSettings.width,
-        i * 80,
-        defaultStaveSettings.width,
-      );
+    let currentStaveNotes: Note[] = [];
+    let currentMeasureValue = 0;
+    let measureCount = 0;
+    let lastMeasurePos = 0;
+    let lineCount = 0;
+    let drawLineBreak = false;
+    for (let i = 0; i < musicData.notes.length; i++) {
+      currentStaveNotes.push(musicData.notes[i]);
+      currentMeasureValue += musicData.timeSignature.value / +musicData.notes[i].duration[0];
+      debugger;
+      if (currentMeasureValue === musicData.timeSignature.value) {
+        if (measureCount % sheetSettings.maxMeasuresPerLine === 0) {
+          lineCount++;
+          drawLineBreak = true;
+          lastMeasurePos = 0;
+        }
+        const currentStave = new Stave(
+          lastMeasurePos === 0 ? sheetSettings.widthOffset : lastMeasurePos,
+          sheetSettings.heightOffset * lineCount,
+          sheetSettings.measureWidth,
+        );
 
-      if (isFirstMeasure) {
-        currentStave.addClef(musicData.clef);
-        currentStave.addTimeSignature(timeSignatureToString(musicData.timeSignature));
-        isFirstMeasure = false;
-      }
-      currentStave.setContext(context).draw();
+        if (measureCount === 0 || drawLineBreak) {
+          currentStave.addClef(musicData.clef);
 
-      const notes = Object.groupBy(musicData.measures[i], (note) => note.voice);
-      for (const voice in notes) {
-        const newVoice = new Voice({
+          if (lineCount === 0) {
+            currentStave.addTimeSignature(timeSignatureToString(musicData.timeSignature));
+          }
+        }
+
+        const notes = mapNotesToVexflow(currentStaveNotes);
+        const voice = new Voice({
           num_beats: musicData.timeSignature.beats,
           beat_value: musicData.timeSignature.value,
         });
+        voice.addTickables(notes);
 
-        const currentNotes = mapNotesToVexflow(notes[voice]);
-        newVoice.addTickables(currentNotes);
-        Formatter.FormatAndDraw(context, currentStave, currentNotes);
+        currentStave.setContext(context).draw();
+        Formatter.FormatAndDraw(context, currentStave, notes);
+        lastMeasurePos = currentStave.getNoteEndX();
+
+        measureCount++;
+        currentMeasureValue = 0;
+        currentStaveNotes = [];
+        drawLineBreak = false;
       }
     }
-
-    // Formatter.FormatAndDraw(context, stave, notes);
   }, [musicData]);
 
   return (
