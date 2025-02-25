@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Vex, Stave, StaveNote, Formatter, Renderer, Clef as VexClef, FontInfo, Voice, RenderContext } from "vexflow";
+import React, { useEffect } from "react";
+import { Vex, Stave, Formatter, FontInfo, Voice } from "vexflow";
 
 import * as S from "./styles";
 import ClefSelector from "./ClefSelector";
@@ -7,7 +7,7 @@ import { useAppSelector } from "@/context/hooks";
 import { getAllMusicData } from "@/context/MusicData/musicDataSlice";
 import TimeSignatureSelector from "./TimeSignatureSelector";
 import useUtils from "@/utils/useUtils";
-import { Clef, Note } from "@/context/MusicData/types";
+import { Note } from "@/context/MusicData/types";
 
 const defaultFontSettings: FontInfo = {
   family: "Arial",
@@ -16,10 +16,12 @@ const defaultFontSettings: FontInfo = {
   style: "",
 };
 
-const defaultStaveSettings = {
-  width: 300,
+const sheetSettings = {
+  measureWidth: 400,
   widthOffset: 10,
-  heightOffset: 20,
+  heightOffset: 110,
+  noteWidth: 26,
+  maxMeasuresPerLine: 3,
 };
 
 function SheetMusic() {
@@ -97,9 +99,9 @@ function SheetMusic() {
       <input type="text" name="notes" id="notes" />
       <ClefSelector />
       <TimeSignatureSelector />
-      <div></div>
-
-      <S.SheetCanvas ref={containerRef} id="render-canvas" />
+      <S.SheetContainer>
+        <S.SheetCanvas ref={containerRef} id="render-canvas" />
+      </S.SheetContainer>
     </S.Container>
   );
 }
