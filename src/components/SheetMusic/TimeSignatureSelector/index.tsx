@@ -1,11 +1,7 @@
 import { useAppDispatch, useAppSelector } from "@/context/hooks";
 import * as S from "./styles";
 import { getTimeSig, setTimeSig } from "@/context/MusicData/musicDataSlice";
-
-export const validTimeSignatureOptions = {
-  beats: [3, 4, 5, 6],
-  values: [4, 8, 12],
-};
+import { validTimeSignatureOptions } from "@/context/MusicData/types";
 
 function TimeSignatureSelector() {
   const dispatch = useAppDispatch();

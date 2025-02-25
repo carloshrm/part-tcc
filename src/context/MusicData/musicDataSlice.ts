@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MusicDataState, Clef, TimeSignature, Note, defaultMusicData } from "./types";
+import { MusicDataState, Clef, TimeSignature, Note, defaultMusicData, RESTS } from "./types";
 
 const musicDataSlice = createSlice({
   name: "musicData",
@@ -12,18 +12,18 @@ const musicDataSlice = createSlice({
     setTimeSig(state, action: PayloadAction<TimeSignature>) {
       state.timeSignature = action.payload;
     },
-    addNote(state, action: PayloadAction<{ note: Note; measure: number }>) {
-      state.measures[action.payload.measure].push(action.payload.note);
+    addNote(state, action: PayloadAction<Note>) {
+      state.notes.push(action.payload);
     },
     addMeasure(state) {
-      state.measures.push(Array(state.timeSignature.beats).fill(undefined));
+      state.notes.push(...Array(state.timeSignature.beats).fill(RESTS[state.timeSignature.value]));
     },
   },
   selectors: {
     getAllMusicData: (state: MusicDataState) => state,
     getClef: (state: MusicDataState) => state.clef,
     getTimeSig: (state: MusicDataState) => state.timeSignature,
-    getMeasures: (state: MusicDataState) => state.measures,
+    getMeasures: (state: MusicDataState) => state.notes,
   },
 });
 
