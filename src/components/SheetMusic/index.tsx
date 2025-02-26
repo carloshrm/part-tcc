@@ -59,6 +59,7 @@ function SheetMusic() {
           lineCount++;
           drawLineBreak = true;
           lastMeasurePos = 0;
+          measureCount = 0;
         }
         const currentStave = new Stave(
           lastMeasurePos === 0 ? sheetSettings.widthOffset : lastMeasurePos,
