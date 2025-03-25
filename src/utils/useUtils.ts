@@ -16,10 +16,15 @@ function UseUtils() {
       });
     });
   };
+  const makeEmptyMeasure = (timeSignature: TimeSignature, duration: number) => {
+    const notesPerBeat = duration / timeSignature.value;
+    return Array(timeSignature.beats * notesPerBeat).fill(RESTS[duration]);
+  };
 
   return {
     timeSignatureToString,
     mapNotesToVexflow,
+    makeEmptyMeasure,
   };
 }
 
