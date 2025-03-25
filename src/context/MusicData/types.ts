@@ -1,7 +1,4 @@
-export enum Clef {
-  Treble = "treble",
-  Bass = "bass",
-}
+import { Clef, RESTS } from "./constants";
 
 export interface Note {
   keys: string[];
@@ -18,20 +15,8 @@ export interface MusicDataState {
   clef: Clef;
   timeSignature: TimeSignature;
   notes: Note[];
+  selectedNote: number;
 }
-
-export const RESTS: { [key: string]: Note } = {
-  WHOLE: { keys: ["b/4"], duration: "1r", voice: 1 },
-  1: { keys: ["b/4"], duration: "1r", voice: 1 },
-  HALF: { keys: ["b/4"], duration: "2r", voice: 1 },
-  2: { keys: ["b/4"], duration: "2r", voice: 1 },
-  QUARTER: { keys: ["b/4"], duration: "4r", voice: 1 },
-  4: { keys: ["b/4"], duration: "4r", voice: 1 },
-  EIGHTH: { keys: ["b/4"], duration: "8r", voice: 1 },
-  8: { keys: ["b/4"], duration: "8r", voice: 1 },
-  SIXTEENTH: { keys: ["b/4"], duration: "16r", voice: 1 },
-  16: { keys: ["b/4"], duration: "16r", voice: 1 },
-};
 
 export const defaultMusicData: MusicDataState = {
   clef: Clef.Treble,
@@ -39,18 +24,19 @@ export const defaultMusicData: MusicDataState = {
     beats: 4,
     value: 4,
   },
+  selectedNote: 0,
   notes: [
-    ...Array(2).fill(RESTS.HALF),
-    ...Array(4).fill(RESTS.QUARTER),
-    ...Array(4).fill(RESTS.QUARTER),
-    ...Array(8).fill({ keys: ["b/4"], duration: "8", voice: 1 }),
-    ...Array(4).fill(RESTS.QUARTER),
-    ...Array(2).fill(RESTS.HALF),
-    ...Array(2).fill(RESTS.HALF),
+    // ...Array(2).fill({ keys: ["c/5"], duration: "2", voice: 1 }),
+    // ...[
+    //   { keys: ["b/4"], duration: "4", voice: 1 },
+    //   { keys: ["a/4"], duration: "4", voice: 1 },
+    //   { keys: ["g/4"], duration: "4", voice: 1 },
+    //   { keys: ["e/5"], duration: "4", voice: 1 },
+    // ],
+    // ...Array(4).fill(RESTS.QUARTER),
+    // ...Array(8).fill({ keys: ["b/4"], duration: "8", voice: 1 }),
+    // ...Array(4).fill(RESTS.QUARTER),
+    // ...Array(2).fill(RESTS.HALF),
+    // ...Array(2).fill(RESTS.HALF),
   ],
-};
-
-export const validTimeSignatureOptions = {
-  beats: [3, 4, 5, 6],
-  values: [4, 6, 8, 12, 16],
 };
