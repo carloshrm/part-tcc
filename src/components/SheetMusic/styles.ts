@@ -1,21 +1,24 @@
 import styled from "styled-components";
 
-export const Container = styled.div`
+export const MainContainer = styled.div`
   display: flex;
-  height: 100%;
+  overflow: scroll;
   background-color: #f5f5f5;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: space-between;
 `;
 
 export const SheetContainer = styled.div`
-  width: 100%;
+  margin: 2rem;
   overflow-x: scroll;
   white-space: nowrap;
 `;
 
+export const ControlsContainer = styled.div`
+  width: 50%;
+`;
+
 export const SheetCanvas = styled.canvas`
-  display: inline-block;
   border: 1px solid black;
 `;

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Vex, Stave, Formatter, FontInfo, Voice } from "vexflow";
+import { Vex, Stave, Formatter, Voice } from "vexflow";
 
 import * as S from "./styles";
 import ClefSelector from "./ClefSelector";
@@ -8,21 +8,8 @@ import { getAllMusicData } from "@/context/MusicData/musicDataSlice";
 import TimeSignatureSelector from "./TimeSignatureSelector";
 import useUtils from "@/utils/useUtils";
 import { Note } from "@/context/MusicData/types";
-
-const defaultFontSettings: FontInfo = {
-  family: "Arial",
-  size: 10,
-  weight: "",
-  style: "",
-};
-
-const sheetSettings = {
-  measureWidth: 400,
-  widthOffset: 10,
-  heightOffset: 110,
-  noteWidth: 26,
-  maxMeasuresPerLine: 3,
-};
+import NoteManager from "./NoteManager";
+import { defaultFontSettings, sheetDisplaySettings } from "@/context/MusicData/constants";
 
 function SheetMusic() {
   const { timeSignatureToString, mapNotesToVexflow } = useUtils();
@@ -31,10 +18,11 @@ function SheetMusic() {
 
   useEffect(() => {
     if (!containerRef.current) return;
+
     const vexFlow = new Vex.Flow.Factory({
       renderer: {
         elementId: containerRef.current.id,
-        width: window.innerWidth * 0.8,
+        width: sheetDisplaySettings.maxMeasuresPerLine * (sheetDisplaySettings.measureWidth * 1.1),
         height: window.innerHeight * 0.8,
         backend: Vex.Flow.Renderer.Backends.CANVAS,
       },
@@ -49,30 +37,25 @@ function SheetMusic() {
     let measureCount = 0;
     let lastMeasurePos = 0;
     let lineCount = 0;
-    let drawLineBreak = false;
     for (let i = 0; i < musicData.notes.length; i++) {
       currentStaveNotes.push(musicData.notes[i]);
       currentMeasureValue += musicData.timeSignature.value / +musicData.notes[i].duration[0];
-      debugger;
+
       if (currentMeasureValue === musicData.timeSignature.value) {
-        if (measureCount % sheetSettings.maxMeasuresPerLine === 0) {
+        if (measureCount % sheetDisplaySettings.maxMeasuresPerLine === 0) {
           lineCount++;
-          drawLineBreak = true;
           lastMeasurePos = 0;
           measureCount = 0;
         }
         const currentStave = new Stave(
-          lastMeasurePos === 0 ? sheetSettings.widthOffset : lastMeasurePos,
-          sheetSettings.heightOffset * lineCount,
-          sheetSettings.measureWidth,
+          lastMeasurePos === 0 ? sheetDisplaySettings.widthOffset : lastMeasurePos,
+          sheetDisplaySettings.heightOffset * lineCount,
+          sheetDisplaySettings.measureWidth,
         );
 
-        if (measureCount === 0 || drawLineBreak) {
+        if (measureCount === 0) {
           currentStave.addClef(musicData.clef);
-
-          if (lineCount === 0) {
-            currentStave.addTimeSignature(timeSignatureToString(musicData.timeSignature));
-          }
+          currentStave.addTimeSignature(timeSignatureToString(musicData.timeSignature));
         }
 
         const notes = mapNotesToVexflow(currentStaveNotes);
@@ -89,21 +72,22 @@ function SheetMusic() {
         measureCount++;
         currentMeasureValue = 0;
         currentStaveNotes = [];
-        drawLineBreak = false;
       }
     }
   }, [musicData]);
 
   return (
-    <S.Container>
-      <h3>Sheet Music</h3>
-      <input type="text" name="notes" id="notes" />
-      <ClefSelector />
-      <TimeSignatureSelector />
+    <S.MainContainer>
+      <S.ControlsContainer>
+        <h3>Sheet Music</h3>
+        <NoteManager />
+        <ClefSelector />
+        <TimeSignatureSelector />
+      </S.ControlsContainer>
       <S.SheetContainer>
         <S.SheetCanvas ref={containerRef} id="render-canvas" />
       </S.SheetContainer>
-    </S.Container>
+    </S.MainContainer>
   );
 }
 
