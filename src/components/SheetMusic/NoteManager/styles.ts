@@ -1,13 +1,23 @@
 import styled from "styled-components";
 
-export const Container = styled.div``;
+export const DurationContainer = styled.div`
+  display: flex;
+  margin: 1rem;
+  width: 100%;
+  justify-content: space-between;
+`;
+
+export const Container = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+`;
 
 export const NoteDisplayContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   margin: 1rem;
   padding: 1rem;
-  gap: 1rem;
+  /* gap: 1rem; */
   border: 1px solid black;
 `;
 
