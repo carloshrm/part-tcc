@@ -1,4 +1,4 @@
-import { RESTS } from "@/context/MusicData/constants";
+import { Clef, RESTS } from "@/context/MusicData/constants";
 import { Note, TimeSignature } from "@/context/MusicData/types";
 import { StaveNote } from "vexflow";
 
@@ -7,11 +7,12 @@ function UseUtils() {
     return `${timeSignature.beats}/${timeSignature.value}`;
   };
 
-  const mapNotesToVexflow = (notes: Note[] | undefined) => {
+  const mapNotesToVexflow = (notes: Note[] | undefined, clef: Clef) => {
     if (!notes) return [];
 
     return notes.map((note, i) => {
       const newNote = new StaveNote({
+        clef,
         keys: note.keys,
         duration: note.duration,
       });
