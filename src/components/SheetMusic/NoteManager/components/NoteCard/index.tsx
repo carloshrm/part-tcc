@@ -14,7 +14,7 @@ function NoteCard({ index, note }: NoteCardProps) {
 
   return (
     <S.CardContainer $selected={index === selectedNote} onClick={() => dispatch(setSelectedNote(index))}>
-      {note.keys.join("-")}
+      {note.duration.includes("r") ? "p" : note.keys.join("-")}
     </S.CardContainer>
   );
 }
