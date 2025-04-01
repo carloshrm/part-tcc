@@ -45,7 +45,22 @@ const musicDataSlice = createSlice({
       state.notes.push(action.payload);
     },
     setNote(state, action: PayloadAction<Note>) {
-      state.notes[state.selectedNote] = action.payload;
+      const currentNoteDuration = parseInt(state.notes[state.selectedNote].duration);
+      const newNoteDuration = parseInt(action.payload.duration);
+
+      if (currentNoteDuration === newNoteDuration) {
+        state.notes[state.selectedNote] = action.payload;
+      }
+
+      if (currentNoteDuration < newNoteDuration) {
+        const splitNoteCount = newNoteDuration / currentNoteDuration;
+        const fillNotes = Array(splitNoteCount).fill(RESTS[newNoteDuration]);
+        fillNotes[0] = action.payload;
+        state.notes.splice(state.selectedNote, 0, ...fillNotes);
+      } else {
+        const deleteCount = currentNoteDuration / newNoteDuration;
+        state.notes.splice(state.selectedNote, deleteCount, action.payload);
+      }
     },
     addMeasure(state, action: PayloadAction<Note[]>) {
       state.notes = [...state.notes, ...action.payload];
