@@ -21,16 +21,17 @@ function UseUtils() {
   };
 
   const mapNotesToMeasures = (notes: Note[], timeSignature: TimeSignature) => {
+    const measureDuration = timeSignature.beats * (1 / timeSignature.value);
     const measures: Note[][] = [];
 
     let currentMeasure: Note[] = [];
     let currentMeasureValue = 0;
+
     notes.forEach((note) => {
-      const noteValue = parseInt(note.duration);
-      currentMeasureValue += timeSignature.value / noteValue;
+      currentMeasureValue += 1 / parseInt(note.duration);
       currentMeasure.push(note);
 
-      if (currentMeasureValue === timeSignature.value) {
+      if (Math.abs(currentMeasureValue - measureDuration) < 1e-6) {
         measures.push(currentMeasure);
         currentMeasure = [];
         currentMeasureValue = 0;
