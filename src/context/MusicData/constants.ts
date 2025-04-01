@@ -20,8 +20,8 @@ export const RESTS: { [key: string]: Note } = {
 };
 
 export const validTimeSignatureOptions = {
-  beats: [3, 4, 5, 6],
-  values: [4, 6, 8, 12, 16],
+  beats: [3, 4, 5, 6, 9, 12],
+  values: [4, 8, 16],
 };
 
 export const validNotes = ["a", "b", "c", "d", "e", "f", "g"];
