@@ -3,11 +3,10 @@ import NoteCard from "./components/NoteCard";
 import React, { useEffect } from "react";
 import UseUtils from "@/utils/useUtils";
 import { getAllMusicData, setNote } from "@/context/MusicData/musicDataSlice";
-import { RESTS, sheetDisplaySettings, validNotes } from "@/context/MusicData/constants";
 import { useAppDispatch, useAppSelector } from "@/context/hooks";
 import { useState } from "react";
-import { Radio, Switch } from "antd";
-import { addNote, addMeasure } from "@/context/MusicData/musicDataSlice";
+import { Button, Input, Radio, Switch, Typography } from "antd";
+import { addMeasure } from "@/context/MusicData/musicDataSlice";
 import { Note } from "@/context/MusicData/types";
 
 function NoteManager() {
@@ -22,28 +21,29 @@ function NoteManager() {
   const measures = mapNotesToMeasures(notes, timeSignature);
 
   useEffect(() => {
-    if (measures.length !== 0) setNoteInput(notes[selectedNote].keys.join(" "));
+    if (measures.length !== 0) {
+      setNoteInput(notes[selectedNote].keys.join(" "));
+    } else {
+      const newMeasure = makeEmptyMeasure(timeSignature, timeInput);
+      stateDispatch(addMeasure(newMeasure));
+    }
   }, [selectedNote]);
 
   const makeNote = (userInput: string, duration: number): Note => {
-    const notes = userInput.split(" ");
+    const notes = userInput.replace("-", "/").split(" ");
     return { keys: notes, duration: `${duration}${restInput ? "r" : ""}`, voice: 1 };
   };
 
-  const validateNoteInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNoteInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     // const inputText = e.target.value.toLowerCase().trim();
+    // TODO validate
     setNoteInput(e.target.value);
   };
 
   const handleSetNote = () => {
-    if (measures.length === 0) {
-      const newMeasure = makeEmptyMeasure(timeSignature, timeInput);
-      newMeasure[0] = makeNote(noteInput, timeInput);
-      stateDispatch(addMeasure(newMeasure));
-    } else {
-      const newNote = makeNote(noteInput, timeInput);
-      stateDispatch(setNote(newNote));
-    }
+    
+    const newNote = makeNote(noteInput, timeInput);
+    stateDispatch(setNote(newNote));
   };
 
   const handleAddMeasure = () => {
@@ -58,17 +58,27 @@ function NoteManager() {
   let indexControl = 0;
   return (
     <S.Container>
-      <Switch checkedChildren={"n"} unCheckedChildren={"r"} defaultChecked onChange={handleRestToggle} />
-      <input type="text" name="noteInput" id="noteInput" value={noteInput} onChange={validateNoteInputChange} />
-      <button type="button" onClick={handleSetNote}>
-        ok
-      </button>
-      <Radio.Group defaultValue={timeInput} buttonStyle="solid" onChange={(e) => setTimeInput(e.target.value)}>
-        <Radio.Button value={2}>2</Radio.Button>
-        <Radio.Button value={4}>4</Radio.Button>
-        <Radio.Button value={8}>8</Radio.Button>
-        <Radio.Button value={16}>16</Radio.Button>
-      </Radio.Group>
+      <Input
+        value={noteInput}
+        onChange={handleNoteInput}
+        addonBefore={
+          <Switch checkedChildren={"n"} unCheckedChildren={"r"} defaultChecked onChange={handleRestToggle} />
+        }
+        addonAfter={
+          <Button size="small" onClick={handleSetNote}>
+            OK
+          </Button>
+        }
+      />
+      <S.DurationContainer>
+        <Typography.Text>Duração</Typography.Text>
+        <Radio.Group defaultValue={timeInput} buttonStyle="solid" onChange={(e) => setTimeInput(e.target.value)}>
+          <Radio.Button value={2}>2</Radio.Button>
+          <Radio.Button value={4}>4</Radio.Button>
+          <Radio.Button value={8}>8</Radio.Button>
+          <Radio.Button value={16}>16</Radio.Button>
+        </Radio.Group>
+      </S.DurationContainer>
       <S.NoteDisplayContainer>
         {measures.map((measure, i) => {
           return (
