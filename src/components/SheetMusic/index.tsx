@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Vex, Stave, Formatter, Voice } from "vexflow";
+import { Vex, Stave, Formatter, Voice, Beam, TextNote } from "vexflow";
 
 import * as S from "./styles";
 import ClefSelector from "./ClefSelector";
@@ -12,9 +12,13 @@ import NoteManager from "./NoteManager";
 import { defaultFontSettings, sheetDisplaySettings } from "@/context/MusicData/constants";
 
 function SheetMusic() {
-  const { timeSignatureToString, mapNotesToVexflow } = useUtils();
+  const { timeSignatureToString, mapNotesToVexflow, mapNotesToMeasures } = useUtils();
   const containerRef = React.useRef<HTMLCanvasElement>(null);
   const musicData = useAppSelector(getAllMusicData);
+
+  useEffect(() => {
+    console.log(musicData.notes);
+  }, [musicData.notes]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -31,17 +35,24 @@ function SheetMusic() {
 
     const context = vexFlow.getContext();
     context.setFont({ ...defaultFontSettings });
-
+    let readSelectedNote = -1;
+    let selectedNoteRef = null;
     let currentStaveNotes: Note[] = [];
     let currentMeasureValue = 0;
     let measureCount = 0;
     let lastMeasurePos = 0;
     let lineCount = 0;
+    const measureDuration = musicData.timeSignature.beats * (1 / musicData.timeSignature.value);
+
     for (let i = 0; i < musicData.notes.length; i++) {
       currentStaveNotes.push(musicData.notes[i]);
-      currentMeasureValue += musicData.timeSignature.value / +musicData.notes[i].duration[0];
+      currentMeasureValue += 1 / parseInt(musicData.notes[i].duration);
 
-      if (currentMeasureValue === musicData.timeSignature.value) {
+      if (i === musicData.selectedNote) {
+        readSelectedNote = currentStaveNotes.length;
+      }
+
+      if (Math.abs(currentMeasureValue - measureDuration) < 1e-6) {
         if (measureCount % sheetDisplaySettings.maxMeasuresPerLine === 0) {
           lineCount++;
           lastMeasurePos = 0;
@@ -58,20 +69,37 @@ function SheetMusic() {
           currentStave.addTimeSignature(timeSignatureToString(musicData.timeSignature));
         }
 
-        const notes = mapNotesToVexflow(currentStaveNotes);
+        const notes = mapNotesToVexflow(currentStaveNotes, musicData.clef);
+
+        if (readSelectedNote !== -1) {
+          selectedNoteRef = notes[readSelectedNote - 1];
+          readSelectedNote = -1;
+        }
+
         const voice = new Voice({
           num_beats: musicData.timeSignature.beats,
           beat_value: musicData.timeSignature.value,
         });
-        voice.addTickables(notes);
 
+        voice.addTickables(notes);
         currentStave.setContext(context).draw();
-        Formatter.FormatAndDraw(context, currentStave, notes);
+        Formatter.FormatAndDraw(context, currentStave, notes, { auto_beam: true });
         lastMeasurePos = currentStave.getNoteEndX();
 
         measureCount++;
         currentMeasureValue = 0;
         currentStaveNotes = [];
+      }
+
+      if (selectedNoteRef !== null) {
+        const pos = selectedNoteRef.getBoundingBox();
+        const canvasContext = containerRef.current.getContext("2d");
+        if (canvasContext) {
+          const prevFill = canvasContext.fillStyle;
+          canvasContext.fillStyle = "#00AA000f";
+          canvasContext.fillRect(pos.x, pos.y, 20, 20);
+          canvasContext.fillStyle = prevFill;
+        }
       }
     }
   }, [musicData]);
@@ -79,7 +107,7 @@ function SheetMusic() {
   return (
     <S.MainContainer>
       <S.ControlsContainer>
-        <h3>Sheet Music</h3>
+        <h3>abcd edit</h3>
         <NoteManager />
         <ClefSelector />
         <TimeSignatureSelector />
