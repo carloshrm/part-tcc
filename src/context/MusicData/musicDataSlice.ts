@@ -10,6 +10,29 @@ const musicDataSlice = createSlice({
       state.clef = action.payload;
     },
     setTimeSig(state, action: PayloadAction<TimeSignature>) {
+      const newSignatureMeasure = action.payload.beats * (1 / action.payload.value);
+      const measures: Note[][] = [];
+      let currentMeasure: Note[] = [];
+      let currentMeasureValue = 0;
+
+      for (const note of state.notes) {
+        currentMeasureValue += 1 / parseInt(note.duration);
+        currentMeasure.push(note);
+
+        if (Math.abs(currentMeasureValue - newSignatureMeasure) < 1e-6) {
+          measures.push(currentMeasure);
+          currentMeasure = [];
+          currentMeasureValue = 0;
+        }
+      }
+
+      if (currentMeasure.length > 0) {
+        const remainingValue = newSignatureMeasure - currentMeasureValue;
+        const noteValue = 1 / remainingValue;
+        if (noteValue in RESTS) {
+          state.notes.push(RESTS[noteValue]);
+        }
+      }
       state.timeSignature = action.payload;
     },
     addNote(state, action: PayloadAction<Note>) {
