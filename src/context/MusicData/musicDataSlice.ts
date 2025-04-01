@@ -7,6 +7,12 @@ const musicDataSlice = createSlice({
   initialState: defaultMusicData,
   reducers: {
     setClef(state, action: PayloadAction<Clef>) {
+      state.notes.forEach((note) => {
+        if (note.duration[1] === "r") {
+          note.keys = [action.payload === Clef.Bass ? "d/3" : "b/4"];
+        }
+      });
+
       state.clef = action.payload;
     },
     setTimeSig(state, action: PayloadAction<TimeSignature>) {
