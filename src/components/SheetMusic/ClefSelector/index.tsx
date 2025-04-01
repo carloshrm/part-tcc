@@ -21,7 +21,7 @@ const ClefSelector = () => {
         onChange={handleClefChange}
         checked={currentClef === Clef.Treble}
       />
-      <label htmlFor="treble-clef">Treble</label>
+      <label htmlFor="treble-clef">Sol</label>
       <input
         type="radio"
         name="clef"
@@ -30,7 +30,7 @@ const ClefSelector = () => {
         onChange={handleClefChange}
         checked={currentClef === Clef.Bass}
       />
-      <label htmlFor="bass-clef">Bass</label>
+      <label htmlFor="bass-clef">Fa</label>
     </S.Container>
   );
 };
