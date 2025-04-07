@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const MainContainer = styled.div`
   display: flex;
   overflow: scroll;
-  background-color: #f5f5f5;
+  background-color: ${({ theme }) => theme.colors.lightBackground};
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;

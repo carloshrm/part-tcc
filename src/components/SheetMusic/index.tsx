@@ -1,24 +1,72 @@
-import React, { useEffect } from "react";
-import { Vex, Stave, Formatter, Voice, Beam, TextNote } from "vexflow";
+import React, { useEffect, useState } from "react";
+import { Vex, Stave, Formatter, Voice, Accidental, BoundingBox } from "vexflow";
 
 import * as S from "./styles";
-import ClefSelector from "./ClefSelector";
-import { useAppSelector } from "@/context/hooks";
-import { getAllMusicData } from "@/context/MusicData/musicDataSlice";
-import TimeSignatureSelector from "./TimeSignatureSelector";
+import { useAppDispatch, useAppSelector } from "@/context/hooks";
+import { getAllMusicData, setHoverNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
 import useUtils from "@/utils/useUtils";
 import { Note } from "@/context/MusicData/types";
 import NoteManager from "./NoteManager";
 import { defaultFontSettings, sheetDisplaySettings } from "@/context/MusicData/constants";
+import { useTheme } from "styled-components";
+import { Input, Typography } from "antd";
+import KeySelector from "./KeySelector";
 
 function SheetMusic() {
-  const { timeSignatureToString, mapNotesToVexflow, mapNotesToMeasures } = useUtils();
+  const [noteCoords, setNoteCoords] = useState<{ [key: number]: BoundingBox }>({});
+  const [musicTitle, setMusicTitle] = useState<string>("Título");
+  const theme = useTheme();
+
+  const { timeSignatureToString, mapNotesToVexflow } = useUtils();
   const containerRef = React.useRef<HTMLCanvasElement>(null);
   const musicData = useAppSelector(getAllMusicData);
+  const dispatch = useAppDispatch();
+
+  const strokeNote = (pos: BoundingBox, isHover: boolean = false) => {
+    if (!containerRef.current) return;
+    const context = containerRef.current.getContext("2d");
+    if (context) {
+      const prevStroke = context.strokeStyle;
+      const prevLineWidth = context.lineWidth;
+
+      context.lineWidth = 3;
+      context.strokeStyle = isHover ? theme.colors.noteHover : theme.colors.noteHighlight;
+      context.strokeRect(pos.x - 5, pos.y - 5, pos.w + 10, pos.h + 10);
+      context.strokeStyle = prevStroke;
+      context.lineWidth = prevLineWidth;
+    }
+  };
+
+  const handleCanvasClick = () => {
+    if (!containerRef.current || musicData.hoverNote === -1) return;
+
+    dispatch(setSelectedNote(musicData.hoverNote));
+    dispatch(setHoverNote(-1));
+    strokeNote(noteCoords[musicData.hoverNote]);
+  };
+
+  const handleCanvasMouseover = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!containerRef.current) return;
+    for (const [key, pos] of Object.entries(noteCoords)) {
+      const intKey = parseInt(key);
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      if (x >= pos.x && x <= pos.x + pos.w && y >= pos.y && y <= pos.y + pos.h) {
+        if (intKey === musicData.selectedNote) return;
+        dispatch(setHoverNote(intKey));
+        return;
+      }
+    }
+  };
 
   useEffect(() => {
-    console.log(musicData.notes);
-  }, [musicData.notes]);
+    if (Object.keys(noteCoords).length === 0) return;
+
+    const pos = noteCoords[musicData.selectedNote];
+    strokeNote(pos);
+  }, [noteCoords]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -26,8 +74,8 @@ function SheetMusic() {
     const vexFlow = new Vex.Flow.Factory({
       renderer: {
         elementId: containerRef.current.id,
-        width: sheetDisplaySettings.maxMeasuresPerLine * (sheetDisplaySettings.measureWidth * 1.1),
-        height: window.innerHeight * 0.8,
+        width: 1240,
+        height: 1754,
         backend: Vex.Flow.Renderer.Backends.CANVAS,
       },
       font: defaultFontSettings,
@@ -35,22 +83,19 @@ function SheetMusic() {
 
     const context = vexFlow.getContext();
     context.setFont({ ...defaultFontSettings });
-    let readSelectedNote = -1;
-    let selectedNoteRef = null;
+    context.fillText(musicTitle, containerRef.current.width / 2, 60);
+
     let currentStaveNotes: Note[] = [];
     let currentMeasureValue = 0;
     let measureCount = 0;
     let lastMeasurePos = 0;
     let lineCount = 0;
+    let indexControl = 0;
     const measureDuration = musicData.timeSignature.beats * (1 / musicData.timeSignature.value);
 
     for (let i = 0; i < musicData.notes.length; i++) {
       currentStaveNotes.push(musicData.notes[i]);
       currentMeasureValue += 1 / parseInt(musicData.notes[i].duration);
-
-      if (i === musicData.selectedNote) {
-        readSelectedNote = currentStaveNotes.length;
-      }
 
       if (Math.abs(currentMeasureValue - measureDuration) < 1e-6) {
         if (measureCount % sheetDisplaySettings.maxMeasuresPerLine === 0) {
@@ -65,16 +110,10 @@ function SheetMusic() {
         );
 
         if (measureCount === 0) {
-          currentStave.addClef(musicData.clef);
+          currentStave.addClef(musicData.clef).addKeySignature(musicData.keySignature);
           currentStave.addTimeSignature(timeSignatureToString(musicData.timeSignature));
         }
-
         const notes = mapNotesToVexflow(currentStaveNotes, musicData.clef);
-
-        if (readSelectedNote !== -1) {
-          selectedNoteRef = notes[readSelectedNote - 1];
-          readSelectedNote = -1;
-        }
 
         const voice = new Voice({
           num_beats: musicData.timeSignature.beats,
@@ -82,24 +121,24 @@ function SheetMusic() {
         });
 
         voice.addTickables(notes);
+        Accidental.applyAccidentals([voice], `C`);
         currentStave.setContext(context).draw();
         Formatter.FormatAndDraw(context, currentStave, notes, { auto_beam: true });
         lastMeasurePos = currentStave.getNoteEndX();
 
+        const notePositions = notes.reduce((acc: { [key: number]: BoundingBox }, note) => {
+          const boundingBox = note.getBoundingBox();
+          if (indexControl === musicData.hoverNote) {
+            strokeNote(boundingBox, true);
+          }
+          acc[indexControl++] = boundingBox;
+          return acc;
+        }, {});
+        setNoteCoords((prev) => ({ ...prev, ...notePositions }));
+
         measureCount++;
         currentMeasureValue = 0;
         currentStaveNotes = [];
-      }
-
-      if (selectedNoteRef !== null) {
-        const pos = selectedNoteRef.getBoundingBox();
-        const canvasContext = containerRef.current.getContext("2d");
-        if (canvasContext) {
-          const prevFill = canvasContext.fillStyle;
-          canvasContext.fillStyle = "#00AA000f";
-          canvasContext.fillRect(pos.x, pos.y, 20, 20);
-          canvasContext.fillStyle = prevFill;
-        }
       }
     }
   }, [musicData]);
@@ -107,13 +146,21 @@ function SheetMusic() {
   return (
     <S.MainContainer>
       <S.ControlsContainer>
-        <h3>abcd edit</h3>
+        <div>
+          <Typography.Title level={3}>Título</Typography.Title>
+          <Input type="text" placeholder="Title" value={musicTitle} onChange={(e) => setMusicTitle(e.target.value)} />
+        </div>
+
+        <KeySelector />
         <NoteManager />
-        <ClefSelector />
-        <TimeSignatureSelector />
       </S.ControlsContainer>
       <S.SheetContainer>
-        <S.SheetCanvas ref={containerRef} id="render-canvas" />
+        <S.SheetCanvas
+          ref={containerRef}
+          id="render-canvas"
+          onMouseMove={handleCanvasMouseover}
+          onMouseDown={handleCanvasClick}
+        />
       </S.SheetContainer>
     </S.MainContainer>
   );
