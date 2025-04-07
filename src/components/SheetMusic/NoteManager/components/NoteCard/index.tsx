@@ -1,7 +1,8 @@
 import { Note } from "@/context/MusicData/types";
 import * as S from "./styles";
 import { useAppDispatch, useAppSelector } from "@/context/hooks";
-import { getSelectedNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
+import { getHoverNote, getSelectedNoteIndex, setHoverNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
+import { FIGURES } from "@/context/MusicData/constants";
 
 export interface NoteCardProps {
   index: number;
@@ -9,12 +10,18 @@ export interface NoteCardProps {
 }
 
 function NoteCard({ index, note }: NoteCardProps) {
-  const selectedNote = useAppSelector(getSelectedNote);
+  const selectedNote = useAppSelector(getSelectedNoteIndex);
+  const hoverNote = useAppSelector(getHoverNote);
   const dispatch = useAppDispatch();
-
   return (
-    <S.CardContainer $selected={index === selectedNote} onClick={() => dispatch(setSelectedNote(index))}>
-      {note.duration.includes("r") ? "p" : note.keys.join("-")}
+    <S.CardContainer
+      className={`index-${index}`}
+      $selected={index === selectedNote}
+      $hovered={index === hoverNote && index !== selectedNote}
+      onClick={() => dispatch(setSelectedNote(index))}
+      onMouseEnter={() => dispatch(setHoverNote(index))}
+    >
+      <span>{FIGURES[parseInt(note.duration)]}</span>
     </S.CardContainer>
   );
 }
