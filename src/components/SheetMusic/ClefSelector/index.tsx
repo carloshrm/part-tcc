@@ -2,35 +2,30 @@ import { useAppDispatch, useAppSelector } from "@/context/hooks";
 import { setClef, getClef } from "@/context/MusicData/musicDataSlice";
 import * as S from "./styles";
 import { Clef } from "@/context/MusicData/constants";
+import { Radio, RadioChangeEvent, Typography } from "antd";
 
 const ClefSelector = () => {
   const currentClef = useAppSelector(getClef);
   const dispatch = useAppDispatch();
 
-  const handleClefChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setClef(e.target.value as Clef));
+  const handleClefChange = (e: RadioChangeEvent) => {
+    dispatch(setClef(e.target.value));
   };
 
   return (
     <S.Container>
-      <input
-        type="radio"
-        name="clef"
-        id="treble-clef"
-        value={Clef.Treble}
+      <Typography.Title level={4}>Clave</Typography.Title>
+      <Radio.Group
+        defaultValue={currentClef}
         onChange={handleClefChange}
-        checked={currentClef === Clef.Treble}
+        value={currentClef}
+        optionType="button"
+        buttonStyle="solid"
+        options={[
+          { label: "Sol", value: Clef.Treble },
+          { label: "Fa", value: Clef.Bass },
+        ]}
       />
-      <label htmlFor="treble-clef">Sol</label>
-      <input
-        type="radio"
-        name="clef"
-        id="bass-clef"
-        value={Clef.Bass}
-        onChange={handleClefChange}
-        checked={currentClef === Clef.Bass}
-      />
-      <label htmlFor="bass-clef">Fa</label>
     </S.Container>
   );
 };
