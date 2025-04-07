@@ -10,16 +10,22 @@ function UseUtils() {
   const mapNotesToVexflow = (notes: Note[] | undefined, clef: Clef) => {
     if (!notes) return [];
 
-    return notes.map((note, i) => {
+    return notes.map((note) => {
       const newNote = new StaveNote({
         clef,
-        keys: note.keys,
+        keys: note.keys.map((key) => `${key.note}/${key.octave}`),
         duration: note.duration,
+        auto_stem: true,
       });
-      newNote.setAttribute("note-id", i.toString());
       return newNote;
     });
   };
+
+  // const mapNotesToToneJS = (notes: Note[]) => {
+  //   return notes.map((note) => {
+
+  //   })
+  // }
 
   const mapNotesToMeasures = (notes: Note[], timeSignature: TimeSignature) => {
     const measureDuration = timeSignature.beats * (1 / timeSignature.value);

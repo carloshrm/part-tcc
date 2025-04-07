@@ -9,7 +9,7 @@ const musicDataSlice = createSlice({
     setClef(state, action: PayloadAction<Clef>) {
       state.notes.forEach((note) => {
         if (note.duration[1] === "r") {
-          note.keys = [action.payload === Clef.Bass ? "d/3" : "b/4"];
+          note.keys = [action.payload === Clef.Bass ? { note: "d", octave: 3 } : { note: "b", octave: 4 }];
         }
       });
 
@@ -67,6 +67,13 @@ const musicDataSlice = createSlice({
     },
     setSelectedNote(state, action: PayloadAction<number>) {
       state.selectedNote = action.payload;
+      state.hoverNote = -1;
+    },
+    setHoverNote(state, action: PayloadAction<number>) {
+      state.hoverNote = action.payload;
+    },
+    setKeySignature(state, action: PayloadAction<string>) {
+      state.keySignature = action.payload;
     },
   },
   selectors: {
@@ -74,11 +81,24 @@ const musicDataSlice = createSlice({
     getClef: (state: MusicDataState) => state.clef,
     getTimeSig: (state: MusicDataState) => state.timeSignature,
     getNotes: (state: MusicDataState) => state.notes,
-    getSelectedNote: (state: MusicDataState) => state.selectedNote,
+    getSelectedNoteIndex: (state: MusicDataState) => state.selectedNote,
+    getHoverNote: (state: MusicDataState) => state.hoverNote,
+    getSelectedNote: (state: MusicDataState) => state.notes[state.selectedNote],
+    getKeySignature: (state: MusicDataState) => state.keySignature,
   },
 });
 
-export const { setClef, setTimeSig, addNote, addMeasure, setSelectedNote, setNote } = musicDataSlice.actions;
-export const { getAllMusicData, getClef, getTimeSig, getNotes, getSelectedNote } = musicDataSlice.selectors;
+export const { setClef, setTimeSig, addNote, addMeasure, setSelectedNote, setNote, setHoverNote, setKeySignature } =
+  musicDataSlice.actions;
+export const {
+  getAllMusicData,
+  getClef,
+  getTimeSig,
+  getNotes,
+  getSelectedNoteIndex,
+  getSelectedNote,
+  getHoverNote,
+  getKeySignature,
+} = musicDataSlice.selectors;
 
 export default musicDataSlice.reducer;
