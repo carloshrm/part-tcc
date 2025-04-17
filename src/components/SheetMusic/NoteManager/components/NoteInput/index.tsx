@@ -14,9 +14,11 @@ function NoteInput({ noteSetter, noteInputState, accSetter }: NoteInputProps) {
   const carouselRef = useRef<CarouselRef>(null);
 
   useEffect(() => {
-    const octaveAvg = Math.round(noteInputState.reduce((acc, note) => acc + note.octave, 0) / noteInputState.length);
+    const octaveAvg = Math.round(
+      noteInputState.reduce((octave, note) => octave + note.octave, 0) / noteInputState.length,
+    );
     if (carouselRef.current) {
-      carouselRef.current.goTo(noteInputOctaves.indexOf(octaveAvg), true);
+      carouselRef.current.goTo(noteInputOctaves.indexOf(octaveAvg));
     }
   }, []);
 

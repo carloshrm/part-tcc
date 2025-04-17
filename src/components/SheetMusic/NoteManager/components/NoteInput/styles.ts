@@ -80,7 +80,7 @@ export const NoteButton = styled(Button).attrs({ type: "default", size: "middle"
     $isSelected ? theme.colors.highlightBackground : theme.colors.white} !important;
 
   color: ${({ $isSelected, theme }) => ($isSelected ? theme.colors.highlightText : theme.colors.main)} !important;
-  box-shadow: 1px 1px 1px 1px ${({ theme }) => theme.colors.shadowColor};
+  box-shadow: 1px 1px 1px 1px ${({ theme }) => theme.colors.shadow};
   text-transform: uppercase;
   font-weight: bold;
 
