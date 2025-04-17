@@ -1,5 +1,6 @@
 import { Clef, RESTS } from "@/context/MusicData/constants";
 import { Note, TimeSignature } from "@/context/MusicData/types";
+import { jsPDF } from "jspdf";
 import { StaveNote } from "vexflow";
 
 function UseUtils() {
@@ -19,32 +20,6 @@ function UseUtils() {
       });
       return newNote;
     });
-  };
-
-  // const mapNotesToToneJS = (notes: Note[]) => {
-  //   return notes.map((note) => {
-
-  //   })
-  // }
-
-  const mapNotesToMeasures = (notes: Note[], timeSignature: TimeSignature) => {
-    const measureDuration = timeSignature.beats * (1 / timeSignature.value);
-    const measures: Note[][] = [];
-
-    let currentMeasure: Note[] = [];
-    let currentMeasureValue = 0;
-
-    notes.forEach((note) => {
-      currentMeasureValue += 1 / parseInt(note.duration);
-      currentMeasure.push(note);
-
-      if (Math.abs(currentMeasureValue - measureDuration) < 1e-6) {
-        measures.push(currentMeasure);
-        currentMeasure = [];
-        currentMeasureValue = 0;
-      }
-    });
-    return measures;
   };
 
   const makeEmptyMeasure = (timeSignature: TimeSignature, duration: number) => {
@@ -72,7 +47,6 @@ function UseUtils() {
     saveAsPNG,
     timeSignatureToString,
     mapNotesToVexflow,
-    mapNotesToMeasures,
     makeEmptyMeasure,
   };
 }
