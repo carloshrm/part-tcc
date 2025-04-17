@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MusicDataState, TimeSignature, Note, defaultMusicData } from "./types";
 import { Clef, RESTS } from "./constants";
 
@@ -75,6 +75,9 @@ const musicDataSlice = createSlice({
     setKeySignature(state, action: PayloadAction<string>) {
       state.keySignature = action.payload;
     },
+    setTitle(state, action: PayloadAction<string>) {
+      state.title = action.payload;
+    },
   },
   selectors: {
     getAllMusicData: (state: MusicDataState) => state,
@@ -85,11 +88,44 @@ const musicDataSlice = createSlice({
     getHoverNote: (state: MusicDataState) => state.hoverNote,
     getSelectedNote: (state: MusicDataState) => state.notes[state.selectedNote],
     getKeySignature: (state: MusicDataState) => state.keySignature,
+    getTitle: (state: MusicDataState) => state.title,
   },
 });
 
-export const { setClef, setTimeSig, addNote, addMeasure, setSelectedNote, setNote, setHoverNote, setKeySignature } =
-  musicDataSlice.actions;
+export const getMeasures = createSelector(
+  [musicDataSlice.selectors.getNotes, musicDataSlice.selectors.getTimeSig],
+  (notes, timeSignature) => {
+    const measureDuration = timeSignature.beats * (1 / timeSignature.value);
+    const measures: Note[][] = [];
+
+    let currentMeasure: Note[] = [];
+    let currentMeasureValue = 0;
+
+    notes.forEach((note) => {
+      currentMeasureValue += 1 / parseInt(note.duration);
+      currentMeasure.push(note);
+
+      if (Math.abs(currentMeasureValue - measureDuration) < 1e-6) {
+        measures.push(currentMeasure);
+        currentMeasure = [];
+        currentMeasureValue = 0;
+      }
+    });
+    return measures;
+  },
+);
+
+export const {
+  setClef,
+  setTimeSig,
+  addNote,
+  addMeasure,
+  setSelectedNote,
+  setNote,
+  setHoverNote,
+  setKeySignature,
+  setTitle,
+} = musicDataSlice.actions;
 export const {
   getAllMusicData,
   getClef,
@@ -99,6 +135,7 @@ export const {
   getSelectedNote,
   getHoverNote,
   getKeySignature,
+  getTitle,
 } = musicDataSlice.selectors;
 
 export default musicDataSlice.reducer;
