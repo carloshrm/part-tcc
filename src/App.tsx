@@ -5,14 +5,17 @@ import { Provider } from "react-redux";
 import { store } from "./context/store";
 import "./assets/fonts/Bravura.css";
 import "./App.css";
+import { ConfigProvider } from "antd";
 
 function App() {
   return (
     <div>
       <ThemeProvider theme={theme}>
-        <Provider store={store}>
-          <Home />
-        </Provider>
+        <ConfigProvider theme={{ token: { colorPrimary: theme.colors.primary } }}>
+          <Provider store={store}>
+            <Home />
+          </Provider>
+        </ConfigProvider>
       </ThemeProvider>
     </div>
   );
