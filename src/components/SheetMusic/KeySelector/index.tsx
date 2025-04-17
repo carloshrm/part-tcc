@@ -32,7 +32,7 @@ function KeySelector() {
   const keyOptions = [{ options: [{ value: "C", label: "C" }] }, sharpOptions, flatOptions];
 
   return (
-    <ControlContainer name="Tonalidade">
+    <ControlContainer name="Tonalidade" defaultCollapsed={true}>
       <Typography.Title level={4}>Armadura de Clave</Typography.Title>
       <S.KeySelect defaultValue={"C"} value={currentSignature} onChange={handleSignatureChange} options={keyOptions} />
       <ClefSelector />
