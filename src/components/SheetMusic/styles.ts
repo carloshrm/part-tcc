@@ -2,11 +2,9 @@ import styled from "styled-components";
 
 export const MainContainer = styled.div`
   display: flex;
-  overflow: scroll;
   background-color: ${({ theme }) => theme.colors.lightBackground};
   flex-direction: row;
   align-items: flex-start;
-  justify-content: space-between;
 `;
 
 export const SheetContainer = styled.div`
@@ -15,9 +13,7 @@ export const SheetContainer = styled.div`
   white-space: nowrap;
 `;
 
-export const ControlsContainer = styled.div`
-  width: 50%;
-`;
+export const ControlsContainer = styled.div``;
 
 export const SheetCanvas = styled.canvas`
   border: 1px solid black;

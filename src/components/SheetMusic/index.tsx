@@ -9,12 +9,14 @@ import { Note } from "@/context/MusicData/types";
 import NoteManager from "./NoteManager";
 import { defaultFontSettings, sheetDisplaySettings } from "@/context/MusicData/constants";
 import { useTheme } from "styled-components";
-import { Input, Typography } from "antd";
 import KeySelector from "./KeySelector";
+import BaseSettings from "./BaseSettings";
+import MeasureDisplay from "./MeasureDisplay";
+import MusicPlayer from "./MusicPlayer";
+import TimeSignatureSelector from "./TimeSignatureSelector";
 
 function SheetMusic() {
   const [noteCoords, setNoteCoords] = useState<{ [key: number]: BoundingBox }>({});
-  const [musicTitle, setMusicTitle] = useState<string>("Título");
   const theme = useTheme();
 
   const { timeSignatureToString, mapNotesToVexflow } = useUtils();
@@ -74,8 +76,8 @@ function SheetMusic() {
     const vexFlow = new Vex.Flow.Factory({
       renderer: {
         elementId: containerRef.current.id,
-        width: 1240,
-        height: 1754,
+        width: sheetDisplaySettings.canvasWidth,
+        height: sheetDisplaySettings.canvasHeight,
         backend: Vex.Flow.Renderer.Backends.CANVAS,
       },
       font: defaultFontSettings,
@@ -83,7 +85,8 @@ function SheetMusic() {
 
     const context = vexFlow.getContext();
     context.setFont({ ...defaultFontSettings });
-    context.fillText(musicTitle, containerRef.current.width / 2, 60);
+    const titleWidth = context.measureText(musicData.title).width;
+    context.fillText(musicData.title, (containerRef.current.width - titleWidth) / 2, 60);
 
     let currentStaveNotes: Note[] = [];
     let currentMeasureValue = 0;
@@ -146,13 +149,12 @@ function SheetMusic() {
   return (
     <S.MainContainer>
       <S.ControlsContainer>
-        <div>
-          <Typography.Title level={3}>Título</Typography.Title>
-          <Input type="text" placeholder="Title" value={musicTitle} onChange={(e) => setMusicTitle(e.target.value)} />
-        </div>
-
-        <KeySelector />
+        <BaseSettings />
+        <MusicPlayer />
         <NoteManager />
+        <MeasureDisplay />
+        <TimeSignatureSelector />
+        <KeySelector />
       </S.ControlsContainer>
       <S.SheetContainer>
         <S.SheetCanvas
