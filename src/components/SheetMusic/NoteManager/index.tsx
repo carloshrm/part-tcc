@@ -1,29 +1,33 @@
 import * as S from "./styles";
-import NoteCard from "./components/NoteCard";
 import UseUtils from "@/utils/useUtils";
 import { getAllMusicData, setNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
 import { useAppDispatch, useAppSelector } from "@/context/hooks";
 import { useState } from "react";
-import { Button, Switch, Tooltip } from "antd";
+import { Button, Radio, RadioChangeEvent, Switch, Tooltip } from "antd";
 import { addMeasure } from "@/context/MusicData/musicDataSlice";
 import { NoteKey } from "@/context/MusicData/types";
 import UsePlayer from "@/utils/usePlayer";
 import NoteInput from "./components/NoteInput";
 import ControlContainer from "@/components/ControlContainer";
 import { FIGURES, RESTS } from "@/context/MusicData/constants";
-import TimeSignatureSelector from "../TimeSignatureSelector";
+import PianoInput from "./components/PianoInput";
+import UseHotkey from "@/utils/useHotkey";
+
+enum InputTypes {
+  Notes,
+  Piano,
+}
 
 function NoteManager() {
   const [timeInput, setTimeInput] = useState<number>(4);
   const [restInput, setRestInput] = useState<boolean>(false);
-  const [mute, setMute] = useState<boolean>(false);
+  const [inputType, setInputType] = useState<InputTypes>(InputTypes.Notes);
 
   const { notes, timeSignature, selectedNote } = useAppSelector(getAllMusicData);
-  const { mapNotesToMeasures, makeEmptyMeasure } = UseUtils();
+  const { makeEmptyMeasure } = UseUtils();
   const { playNote } = UsePlayer();
-  const stateDispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
-  const measures = mapNotesToMeasures(notes, timeSignature);
   const keys = notes[selectedNote].duration.includes("r") ? [] : notes[selectedNote].keys;
 
   const handleSetAccidental = (noteKey: NoteKey, accidental: string) => {
@@ -34,10 +38,7 @@ function NoteManager() {
 
     const newKey = { note: `${noteKey.note[0]}${accidental}`, octave: noteKey.octave };
     const newNote = { keys: [...currentKeys, newKey], duration: timeInput.toString(), voice: 1 };
-    stateDispatch(setNote(newNote));
-    if (!mute) {
-      playNote(newNote.keys, timeInput);
-    }
+    dispatch(setNote(newNote));
   };
 
   const handleSetNoteInput = (noteKey: NoteKey, deselect: boolean) => {
@@ -53,65 +54,83 @@ function NoteManager() {
     }
 
     if (currentKeys.length === 0) {
-      stateDispatch(setNote(RESTS[timeInput]));
+      dispatch(setNote(RESTS[timeInput]));
       return;
     }
 
     let newNote = { keys: currentKeys, duration: timeInput.toString(), voice: 1 };
-    stateDispatch(setNote(newNote));
-    if (!mute) {
-      playNote(newNote.keys, timeInput);
-    }
+    dispatch(setNote(newNote));
+    playNote(newNote.keys, timeInput);
   };
 
   const handleAddMeasure = () => {
     const emptyMeasure = makeEmptyMeasure(timeSignature, timeInput);
-    stateDispatch(addMeasure(emptyMeasure));
+    dispatch(addMeasure(emptyMeasure));
   };
 
   const handleRestToggle = (checked: boolean) => {
     if (!checked) {
-      stateDispatch(setNote(RESTS[timeInput]));
+      dispatch(setNote(RESTS[timeInput]));
     }
 
     setRestInput(!checked);
   };
 
-  const handleMoveSelection = (direction: "left" | "right") => {
-    if ((selectedNote === 0 && direction === "left") || (selectedNote === notes.length - 1 && direction === "right")) {
+  const handleMoveSelection = (direction: number) => {
+    const nextSelectedNote = selectedNote + direction;
+    if ((selectedNote === 0 && direction < 0) || (selectedNote === notes.length - 1 && direction > 0)) {
       return;
     }
-    const nextSelectedNote = direction === "left" ? selectedNote - 1 : selectedNote + 1;
-    stateDispatch(setSelectedNote(nextSelectedNote));
+    dispatch(setSelectedNote(nextSelectedNote));
   };
 
-  let indexControl = 0;
+  const handleDurationChange = (e: RadioChangeEvent) => {
+    setTimeInput(e.target.value);
+  };
+
+  const inputElement = () => {
+    switch (inputType) {
+      case InputTypes.Notes:
+        return <NoteInput noteSetter={handleSetNoteInput} accSetter={handleSetAccidental} noteInputState={keys} />;
+      case InputTypes.Piano:
+        return <PianoInput noteSetter={handleSetNoteInput} accSetter={handleSetAccidental} noteInputState={keys} />;
+    }
+  };
+
+  UseHotkey("ArrowLeft", () => handleMoveSelection(-1));
+  UseHotkey("ArrowRight", () => handleMoveSelection(1));
+
   return (
-    <S.Container>
+    <>
       <ControlContainer name="Notas">
-        <Tooltip title="Liga ou Desliga o som">
-          <S.MuteButton $isMuted={mute} onClick={() => setMute(!mute)}>
-            {mute ? "\ueb26" : "\ueb27"}
-          </S.MuteButton>
-        </Tooltip>
-        {/* <S.PlayButton>{"\ueb1c"}</S.PlayButton> */}
-        {notes[selectedNote] && (
-          <NoteInput noteSetter={handleSetNoteInput} accSetter={handleSetAccidental} noteInputState={keys} />
-        )}
-        <S.SelectContainer>
-          <Button type="default" onClick={() => handleMoveSelection("left")}>
+        <div>
+          <Radio.Group
+            defaultValue={InputTypes.Notes}
+            buttonStyle="solid"
+            onChange={(e) => setInputType(e.target.value)}
+          >
+            <Radio.Button value={InputTypes.Notes}>Notas</Radio.Button>
+            <Radio.Button value={InputTypes.Piano}>Piano</Radio.Button>
+          </Radio.Group>
+        </div>
+
+        {notes[selectedNote] && inputElement()}
+
+        <S.NoteSelectControls>
+          <Button type="default" onClick={() => handleMoveSelection(-1)}>
             Anterior
           </Button>
+          <Button type="default" onClick={() => handleMoveSelection(1)}>
+            Próxima
+          </Button>
+          <S.AutoButton>{">"}</S.AutoButton>
           <Button type="default" onClick={() => playNote(keys, timeInput)}>
             Ouvir
-          </Button>
-          <Button type="default" onClick={() => handleMoveSelection("right")}>
-            Próxima
           </Button>
           <Button type="default" onClick={handleAddMeasure}>
             Novo Compasso
           </Button>
-        </S.SelectContainer>
+        </S.NoteSelectControls>
 
         <S.RestContainer>
           <S.ControlTitle>Pausa</S.ControlTitle>
@@ -121,7 +140,7 @@ function NoteManager() {
 
         <S.DurationContainer>
           <S.ControlTitle>Duração</S.ControlTitle>
-          <S.DurationRadio defaultValue={timeInput} buttonStyle="solid" onChange={(e) => setTimeInput(e.target.value)}>
+          <S.DurationRadio defaultValue={timeInput} buttonStyle="solid" onChange={handleDurationChange}>
             <Tooltip title={"Mínima"}>
               <S.DurationOption value={2}>{FIGURES[2]}</S.DurationOption>
             </Tooltip>
@@ -136,23 +155,8 @@ function NoteManager() {
             </Tooltip>
           </S.DurationRadio>
         </S.DurationContainer>
-        <TimeSignatureSelector />
       </ControlContainer>
-
-      <ControlContainer name="Compassos" scroll>
-        <S.MeasureDisplayContainer>
-          {measures.map((measure, i) => {
-            return (
-              <S.MeasureContainer key={i} $count={i}>
-                {measure.map((note, j) => {
-                  return <NoteCard key={j + i} index={indexControl++} note={note} />;
-                })}
-              </S.MeasureContainer>
-            );
-          })}
-        </S.MeasureDisplayContainer>
-      </ControlContainer>
-    </S.Container>
+    </>
   );
 }
 
