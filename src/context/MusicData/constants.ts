@@ -6,6 +6,12 @@ export enum Clef {
   Bass = "bass",
 }
 
+export enum SaveOptions {
+  PDF = "pdf",
+  PNG = "png",
+  MIDI = "midi",
+}
+
 export const RESTS: { [key: string]: Note } = {
   WHOLE: { keys: [{ note: "b", octave: 4 }], duration: "1r", voice: 1 },
   HALF: { keys: [{ note: "b", octave: 4 }], duration: "2r", voice: 1 },
@@ -62,6 +68,8 @@ export const sheetDisplaySettings = {
   heightOffset: 110,
   noteWidth: 26,
   maxMeasuresPerLine: 3,
+  canvasWidth: 1240,
+  canvasHeight: 1754,
 };
 
 export const defaultFontSettings: FontInfo = {
