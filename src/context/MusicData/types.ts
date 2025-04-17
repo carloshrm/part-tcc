@@ -23,10 +23,12 @@ export interface MusicDataState {
   selectedNote: number;
   hoverNote: number;
   keySignature: string;
+  title: string;
 }
 
 export const defaultMusicData: MusicDataState = {
   clef: Clef.Treble,
+  title: "Sem título",
   timeSignature: {
     beats: 4,
     value: 4,
