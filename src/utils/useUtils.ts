@@ -52,7 +52,24 @@ function UseUtils() {
     return Array(timeSignature.beats * notesPerBeat).fill(RESTS[duration]);
   };
 
+  const saveAsPDF = (canvas: HTMLCanvasElement) => {
+    const document = new jsPDF();
+    const imgData = canvas.toDataURL("image/png", 1.0);
+
+    document.addImage(imgData, "PNG", 0, 0, 210, 297);
+    document.save("Partitura.pdf");
+  };
+
+  const saveAsPNG = (canvas: HTMLCanvasElement) => {
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = "Partitura.png";
+    link.click();
+  };
+
   return {
+    saveAsPDF,
+    saveAsPNG,
     timeSignatureToString,
     mapNotesToVexflow,
     mapNotesToMeasures,
