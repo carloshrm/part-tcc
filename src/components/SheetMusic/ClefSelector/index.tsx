@@ -1,8 +1,8 @@
 import { useAppDispatch, useAppSelector } from "@/context/hooks";
-import { setClef, getClef } from "@/context/MusicData/musicDataSlice";
-import * as S from "./styles";
 import { Clef } from "@/context/MusicData/constants";
+import { getClef, setClef } from "@/context/MusicData/musicDataSlice";
 import { Radio, RadioChangeEvent, Typography } from "antd";
+import * as S from "./styles";
 
 const ClefSelector = () => {
   const currentClef = useAppSelector(getClef);

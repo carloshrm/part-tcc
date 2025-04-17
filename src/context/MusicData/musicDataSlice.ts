@@ -1,6 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MusicDataState, TimeSignature, Note, defaultMusicData } from "./types";
 import { Clef, RESTS } from "./constants";
+import { defaultMusicData, MusicDataState, Note, TimeSignature } from "./types";
 
 const musicDataSlice = createSlice({
   name: "musicData",

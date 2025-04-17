@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Vex, Stave, Formatter, Voice, Accidental, BoundingBox } from "vexflow";
+import { Accidental, BoundingBox, Formatter, Stave, Vex, Voice } from "vexflow";
 
-import * as S from "./styles";
 import { useAppDispatch, useAppSelector } from "@/context/hooks";
-import { getAllMusicData, setHoverNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
-import useUtils from "@/utils/useUtils";
-import { Note } from "@/context/MusicData/types";
-import NoteManager from "./NoteManager";
 import { defaultFontSettings, sheetDisplaySettings } from "@/context/MusicData/constants";
+import { getAllMusicData, setHoverNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
+import { Note } from "@/context/MusicData/types";
+import useUtils from "@/utils/useUtils";
 import { useTheme } from "styled-components";
-import KeySelector from "./KeySelector";
 import BaseSettings from "./BaseSettings";
+import KeySelector from "./KeySelector";
 import MeasureDisplay from "./MeasureDisplay";
 import MusicPlayer from "./MusicPlayer";
+import NoteManager from "./NoteManager";
+import * as S from "./styles";
 import TimeSignatureSelector from "./TimeSignatureSelector";
 
 function SheetMusic() {

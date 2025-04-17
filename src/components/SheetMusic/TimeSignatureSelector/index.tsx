@@ -1,10 +1,10 @@
 import { useAppDispatch, useAppSelector } from "@/context/hooks";
 // import * as S from "./styles";
-import { getTimeSig, setTimeSig } from "@/context/MusicData/musicDataSlice";
-import { validTimeSignatureOptions } from "@/context/MusicData/constants";
-import { InputNumber, Select, Typography } from "antd";
 import ControlContainer from "@/components/ControlContainer";
+import { validTimeSignatureOptions } from "@/context/MusicData/constants";
+import { getTimeSig, setTimeSig } from "@/context/MusicData/musicDataSlice";
 import { getAllPlayerSettings, setBpm } from "@/context/Player/playerSettingsSlice";
+import { InputNumber, Select, Typography } from "antd";
 
 function TimeSignatureSelector() {
   const currentTimeSignature = useAppSelector(getTimeSig);

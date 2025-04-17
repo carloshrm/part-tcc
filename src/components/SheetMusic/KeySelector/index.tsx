@@ -1,10 +1,10 @@
+import ControlContainer from "@/components/ControlContainer";
 import { useAppDispatch, useAppSelector } from "@/context/hooks";
-import * as S from "./styles";
+import { validKeySignatures } from "@/context/MusicData/constants";
 import { getKeySignature, setKeySignature } from "@/context/MusicData/musicDataSlice";
 import { Typography } from "antd";
-import { validKeySignatures } from "@/context/MusicData/constants";
-import ControlContainer from "@/components/ControlContainer";
 import ClefSelector from "../ClefSelector";
+import * as S from "./styles";
 
 function KeySelector() {
   const currentSignature = useAppSelector(getKeySignature);

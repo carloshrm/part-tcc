@@ -1,9 +1,9 @@
-import UsePlayer from "@/utils/usePlayer";
-import * as S from "./styles";
-import { Slider, Tooltip } from "antd";
+import ControlContainer from "@/components/ControlContainer";
 import { useAppDispatch } from "@/context/hooks";
 import { setVolume, toggleMute } from "@/context/Player/playerSettingsSlice";
-import ControlContainer from "@/components/ControlContainer";
+import UsePlayer from "@/utils/usePlayer";
+import { Slider, Tooltip } from "antd";
+import * as S from "./styles";
 
 function MusicPlayer() {
   const { isMuted, playMusic, stopPlayer, isPlaying, volume } = UsePlayer();

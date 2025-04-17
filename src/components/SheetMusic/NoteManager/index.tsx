@@ -1,17 +1,16 @@
-import * as S from "./styles";
-import UseUtils from "@/utils/useUtils";
-import { getAllMusicData, setNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
-import { useAppDispatch, useAppSelector } from "@/context/hooks";
-import { useState } from "react";
-import { Button, Radio, RadioChangeEvent, Switch, Tooltip } from "antd";
-import { addMeasure } from "@/context/MusicData/musicDataSlice";
-import { NoteKey } from "@/context/MusicData/types";
-import UsePlayer from "@/utils/usePlayer";
-import NoteInput from "./components/NoteInput";
 import ControlContainer from "@/components/ControlContainer";
 import { FIGURES, RESTS } from "@/context/MusicData/constants";
-import PianoInput from "./components/PianoInput";
+import { addMeasure, getAllMusicData, setNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
+import { NoteKey } from "@/context/MusicData/types";
+import { useAppDispatch, useAppSelector } from "@/context/hooks";
 import UseHotkey from "@/utils/useHotkey";
+import UsePlayer from "@/utils/usePlayer";
+import UseUtils from "@/utils/useUtils";
+import { Button, Radio, RadioChangeEvent, Switch, Tooltip } from "antd";
+import { useState } from "react";
+import NoteInput from "./components/NoteInput";
+import PianoInput from "./components/PianoInput";
+import * as S from "./styles";
 
 enum InputTypes {
   Notes,

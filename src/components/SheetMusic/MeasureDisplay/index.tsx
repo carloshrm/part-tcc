@@ -1,7 +1,7 @@
 import ControlContainer from "@/components/ControlContainer";
-import NoteCard from "./components/NoteCard";
 import { useAppSelector } from "@/context/hooks";
 import { getMeasures } from "@/context/MusicData/musicDataSlice";
+import NoteCard from "./components/NoteCard";
 import * as S from "./styles";
 
 function MeasureDisplay() {

@@ -1,8 +1,8 @@
 import { musicNotes } from "@/context/MusicData/constants";
-import * as S from "./styles";
-import { NoteInputProps } from "../NoteInput";
 import { NoteKey } from "@/context/MusicData/types";
 import { useState } from "react";
+import { NoteInputProps } from "../NoteInput";
+import * as S from "./styles";
 
 function PianoInput({ noteInputState, noteSetter }: NoteInputProps) {
   const [expanded, setExpanded] = useState(false);

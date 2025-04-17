@@ -1,6 +1,6 @@
+import { CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import * as S from "./styles";
-import { CaretUpOutlined, CaretDownOutlined } from "@ant-design/icons";
 
 export interface ControlContainerProps {
   children: React.ReactNode;

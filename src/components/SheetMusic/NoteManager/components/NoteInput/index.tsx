@@ -1,8 +1,8 @@
-import { NoteKey } from "@/context/MusicData/types";
-import * as S from "./styles";
 import { musicNotes, noteInputOctaves } from "@/context/MusicData/constants";
-import { useEffect, useRef } from "react";
+import { NoteKey } from "@/context/MusicData/types";
 import { CarouselRef } from "antd/es/carousel";
+import { useEffect, useRef } from "react";
+import * as S from "./styles";
 
 export interface NoteInputProps {
   noteSetter: (noteKey: NoteKey, isSelected: boolean) => void;

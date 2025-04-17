@@ -1,8 +1,8 @@
+import { useAppDispatch, useAppSelector } from "@/context/hooks";
+import { FIGURES } from "@/context/MusicData/constants";
+import { getHoverNote, getSelectedNoteIndex, setHoverNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
 import { Note } from "@/context/MusicData/types";
 import * as S from "./styles";
-import { useAppDispatch, useAppSelector } from "@/context/hooks";
-import { getHoverNote, getSelectedNoteIndex, setHoverNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
-import { FIGURES } from "@/context/MusicData/constants";
 
 export interface NoteCardProps {
   index: number;
