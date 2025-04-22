@@ -33,13 +33,40 @@ export const DurationOption = styled(Radio.Button)`
 `;
 
 export const NoteSelectControls = styled.div`
-  margin: 1rem;
+  margin: 1rem 0;
   display: flex;
-  gap: 1rem;
+  gap: 0.6rem;
+`;
+
+export const NoteSelectControlsContainer = styled.div`
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+
+  button {
+    width: fit-content;
+  }
 `;
 
 export const AutoButton = styled(Button).attrs({
   type: "default",
+})<{ $active?: boolean }>`
+  border-left: none;
+  text-orientation: upright;
+  writing-mode: vertical-rl;
+  line-height: 0;
+  font-size: 0.8rem;
+  background-color: ${({ $active, theme }) => ($active ? theme.colors.highlightBackground : "")} !important;
+  color: ${({ $active, theme }) => ($active ? theme.colors.highlightText : "")};
+`;
+
+export const NextContainer = styled.div`
+  display: flex;
+  margin: 0;
+`;
+
+export const NextButton = styled(Button).attrs({
+  type: "default",
 })`
-  border: none;
+  border-right: none;
 `;

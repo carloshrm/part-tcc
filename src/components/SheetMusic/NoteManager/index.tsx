@@ -1,13 +1,14 @@
 import ControlContainer from "@/components/ControlContainer";
-import { FIGURES, RESTS } from "@/context/MusicData/constants";
+import { RESTS } from "@/context/MusicData/constants";
 import { addMeasure, getAllMusicData, setNote, setSelectedNote } from "@/context/MusicData/musicDataSlice";
 import { NoteKey } from "@/context/MusicData/types";
 import { useAppDispatch, useAppSelector } from "@/context/hooks";
 import UseHotkey from "@/utils/useHotkey";
+import UseMusicSymbol from "@/utils/useMusicSymbol";
 import UsePlayer from "@/utils/usePlayer";
 import UseUtils from "@/utils/useUtils";
 import { Button, Radio, RadioChangeEvent, Switch, Tooltip } from "antd";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import NoteInput from "./components/NoteInput";
 import PianoInput from "./components/PianoInput";
 import * as S from "./styles";
@@ -18,14 +19,30 @@ enum InputTypes {
 }
 
 function NoteManager() {
-  const [timeInput, setTimeInput] = useState<number>(4);
+  const { notes, timeSignature, selectedNote } = useAppSelector(getAllMusicData);
+
+  const [timeInput, setTimeInput] = useState<string>("4");
   const [restInput, setRestInput] = useState<boolean>(false);
   const [inputType, setInputType] = useState<InputTypes>(InputTypes.Notes);
+  const [autoNext, setAutoNext] = useState<boolean>(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { notes, timeSignature, selectedNote } = useAppSelector(getAllMusicData);
   const { makeEmptyMeasure } = UseUtils();
   const { playNote } = UsePlayer();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!autoNext && timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  }, [autoNext]);
+
+  useEffect(() => {
+    if (notes[selectedNote]) {
+      setTimeInput(notes[selectedNote].duration);
+      setRestInput(notes[selectedNote].duration.includes("r"));
+    }
+  }, []);
 
   const keys = notes[selectedNote].duration.includes("r") ? [] : notes[selectedNote].keys;
 
@@ -44,7 +61,6 @@ function NoteManager() {
     if (restInput) {
       return;
     }
-
     let currentKeys: NoteKey[] = keys;
     if (deselect) {
       currentKeys = currentKeys.filter((key) => !(key.note === noteKey.note && key.octave === noteKey.octave));
@@ -59,7 +75,22 @@ function NoteManager() {
 
     let newNote = { keys: currentKeys, duration: timeInput.toString(), voice: 1 };
     dispatch(setNote(newNote));
-    playNote(newNote.keys, timeInput);
+    playNote();
+
+    if (autoNext) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        let nextSelectedNote = selectedNote + 1;
+
+        if (nextSelectedNote === notes.length) {
+          nextSelectedNote = 0;
+        }
+        dispatch(setSelectedNote(nextSelectedNote));
+      }, 2500);
+    }
   };
 
   const handleAddMeasure = () => {
@@ -76,15 +107,21 @@ function NoteManager() {
   };
 
   const handleMoveSelection = (direction: number) => {
-    const nextSelectedNote = selectedNote + direction;
-    if ((selectedNote === 0 && direction < 0) || (selectedNote === notes.length - 1 && direction > 0)) {
-      return;
+    let nextSelectedNote = selectedNote + direction;
+    if (nextSelectedNote < 0) {
+      nextSelectedNote = notes.length - 1;
+    } else if (nextSelectedNote >= notes.length) {
+      nextSelectedNote = 0;
     }
     dispatch(setSelectedNote(nextSelectedNote));
   };
 
   const handleDurationChange = (e: RadioChangeEvent) => {
     setTimeInput(e.target.value);
+  };
+
+  const handleToggleAutoNext = () => {
+    setAutoNext(!autoNext);
   };
 
   const inputElement = () => {
@@ -115,21 +152,24 @@ function NoteManager() {
 
         {notes[selectedNote] && inputElement()}
 
-        <S.NoteSelectControls>
-          <Button type="default" onClick={() => handleMoveSelection(-1)}>
-            Anterior
-          </Button>
-          <Button type="default" onClick={() => handleMoveSelection(1)}>
-            Próxima
-          </Button>
-          <S.AutoButton>{">"}</S.AutoButton>
-          <Button type="default" onClick={() => playNote(keys, timeInput)}>
-            Ouvir
-          </Button>
+        <S.NoteSelectControlsContainer>
+          <S.ControlTitle>Controles de seleção</S.ControlTitle>
+
+          <S.NoteSelectControls>
+            <Button type="default" onClick={() => handleMoveSelection(-1)}>
+              Anterior
+            </Button>
+            <S.NextContainer>
+              <S.NextButton onClick={() => handleMoveSelection(1)}>Próxima</S.NextButton>
+              <S.AutoButton onClick={handleToggleAutoNext} $active={autoNext}>
+                {UseMusicSymbol("REPEAT", "SMALL")}
+              </S.AutoButton>
+            </S.NextContainer>
+          </S.NoteSelectControls>
           <Button type="default" onClick={handleAddMeasure}>
             Novo Compasso
           </Button>
-        </S.NoteSelectControls>
+        </S.NoteSelectControlsContainer>
 
         <S.RestContainer>
           <S.ControlTitle>Pausa</S.ControlTitle>
@@ -139,18 +179,18 @@ function NoteManager() {
 
         <S.DurationContainer>
           <S.ControlTitle>Duração</S.ControlTitle>
-          <S.DurationRadio defaultValue={timeInput} buttonStyle="solid" onChange={handleDurationChange}>
+          <S.DurationRadio value={timeInput} buttonStyle="solid" onChange={handleDurationChange}>
             <Tooltip title={"Mínima"}>
-              <S.DurationOption value={2}>{FIGURES[2]}</S.DurationOption>
+              <S.DurationOption value={"2"}>{UseMusicSymbol("2", "SMALL")}</S.DurationOption>
             </Tooltip>
             <Tooltip title={"Semínima"}>
-              <S.DurationOption value={4}>{FIGURES[4]}</S.DurationOption>
+              <S.DurationOption value={"4"}>{UseMusicSymbol("4", "SMALL")}</S.DurationOption>
             </Tooltip>
             <Tooltip title={"Colcheia"}>
-              <S.DurationOption value={8}>{FIGURES[8]}</S.DurationOption>
+              <S.DurationOption value={"8"}>{UseMusicSymbol("8", "SMALL")}</S.DurationOption>
             </Tooltip>
             <Tooltip title={"Semicolcheia"}>
-              <S.DurationOption value={16}>{FIGURES[16]}</S.DurationOption>
+              <S.DurationOption value={"16"}>{UseMusicSymbol("16", "SMALL")}</S.DurationOption>
             </Tooltip>
           </S.DurationRadio>
         </S.DurationContainer>
