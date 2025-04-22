@@ -15,3 +15,8 @@ export const MainLayout = styled(Layout)`
   display: flex;
   flex-direction: column;
 `;
+
+export const Footer = styled(Layout.Footer)`
+  background-color: ${({ theme }) => theme.colors.highlightBackground};
+  color: ${({ theme }) => theme.colors.highlightText};
+`;
