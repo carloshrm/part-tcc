@@ -87,8 +87,8 @@ function SheetMusic() {
     context.setFont({ ...defaultFontSettings });
     const titleWidth = context.measureText(musicData.title).width;
     context.fillText(musicData.title, (containerRef.current.width - titleWidth) / 2, 60);
-    context.setFont({ ...defaultFontSettings, size: 14 });
-    context.fillText(musicData.tempo, containerRef.current.width * 0.06, 100);
+    context.setFont({ ...defaultFontSettings, size: 16, weight: "bold" });
+    context.fillText(musicData.tempo, containerRef.current.width * 0.06, 120);
 
     let currentStaveNotes: Note[] = [];
     let currentMeasureValue = 0;

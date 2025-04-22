@@ -22,7 +22,7 @@ export const SheetContainer = styled.div`
 `;
 
 export const ControlsContainer = styled.div`
-  width: 50vw;
+  width: 30vw;
   min-width: 30rem;
   margin: 1rem 0.4rem;
   border-left: 1rem solid ${({ theme }) => theme.colors.highlightBackground};
