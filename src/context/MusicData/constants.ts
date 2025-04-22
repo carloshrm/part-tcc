@@ -25,15 +25,6 @@ export const RESTS: { [key: string]: Note } = {
   16: { keys: [{ note: "b", octave: 4 }], duration: "16r", voice: 1 },
 };
 
-// Use Bravura font-face
-export const FIGURES: { [key: number]: string } = {
-  1: "\u2669",
-  2: "\uE1D3",
-  4: "\uE1D5",
-  8: "\uE1D7",
-  16: "\uE1D9",
-};
-
 export const validTimeSignatureOptions = {
   beats: [3, 4, 5, 6, 9, 12],
   values: [4, 8, 16],
@@ -77,6 +68,23 @@ export const defaultFontSettings: FontInfo = {
   size: 40,
   weight: "",
   style: "",
+};
+
+const TEMPO = {
+  24: "Larghissimo",
+  40: "Adagissimo",
+  41: "Largo",
+  50: "Adagio",
+  55: "Lento",
+  72: "Andante",
+  84: "Andantino",
+  100: "Moderato",
+  110: "Allegretto",
+  120: "Allegro",
+  132: "Allegro vivace",
+  140: "Vivace",
+  150: "Presto",
+  160: "Prestissimo",
 };
 
 export const musicNotes = ["c", "d", "e", "f", "g", "a", "b"];
