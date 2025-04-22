@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PURGE } from "redux-persist";
 import { defaultPlayerSettings, PlayerSettingsState } from "./types";
 
 const playerSettingsSlice = createSlice({
@@ -20,6 +21,11 @@ const playerSettingsSlice = createSlice({
   },
   selectors: {
     getAllPlayerSettings: (state: PlayerSettingsState) => state,
+  },
+  extraReducers: (builder) => {
+    builder.addCase(PURGE, () => {
+      return defaultPlayerSettings;
+    });
   },
 });
 
