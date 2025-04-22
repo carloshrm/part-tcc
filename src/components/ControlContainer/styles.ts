@@ -4,7 +4,7 @@ export const ControlFieldset = styled.fieldset<{ $scroll: boolean; $collapsed: b
   margin: 1rem;
   padding: ${({ $collapsed }) => ($collapsed ? "0 1rem" : "1rem")};
 
-  width: ${({ $collapsed }) => ($collapsed ? "10rem" : "28rem")};
+  width: ${({ $collapsed }) => ($collapsed ? "32%" : "30rem")};
 
   overflow: ${({ $scroll, $collapsed }) => (!$scroll || $collapsed ? "hidden" : "scroll")};
   height: ${({ $scroll, $collapsed }) => {
@@ -25,7 +25,7 @@ export const ControlFieldset = styled.fieldset<{ $scroll: boolean; $collapsed: b
   background-color: ${({ theme, $collapsed }) => ($collapsed ? theme.colors.highlightBackground : "")};
 
   border: 1px solid ${({ theme }) => theme.colors.highlightBackground};
-  border-radius: ${({ theme, $collapsed }) => ($collapsed ? theme.borderRadius.defaultRadius : "")};
+  /* border-radius: ${({ theme, $collapsed }) => ($collapsed ? theme.borderRadius.defaultRadius : "")}; */
   legend {
     font-weight: bold;
     padding: 0.4rem 1rem;
