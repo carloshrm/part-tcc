@@ -1,4 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PURGE } from "redux-persist";
 import { Clef, RESTS } from "./constants";
 import { defaultMusicData, MusicDataState, Note, TimeSignature } from "./types";
 
@@ -47,19 +48,18 @@ const musicDataSlice = createSlice({
     setNote(state, action: PayloadAction<Note>) {
       const currentNoteDuration = parseInt(state.notes[state.selectedNote].duration);
       const newNoteDuration = parseInt(action.payload.duration);
-
-      if (currentNoteDuration === newNoteDuration) {
-        state.notes[state.selectedNote] = action.payload;
-      }
-
       if (currentNoteDuration < newNoteDuration) {
         const splitNoteCount = newNoteDuration / currentNoteDuration;
         const fillNotes = Array(splitNoteCount).fill(RESTS[newNoteDuration]);
+        const deleteCount = state.notes[state.selectedNote].duration[1] === "r" ? 1 : 0;
         fillNotes[0] = action.payload;
-        state.notes.splice(state.selectedNote, 0, ...fillNotes);
-      } else {
+
+        state.notes.splice(state.selectedNote, deleteCount, ...fillNotes);
+      } else if (currentNoteDuration > newNoteDuration) {
         const deleteCount = currentNoteDuration / newNoteDuration;
         state.notes.splice(state.selectedNote, deleteCount, action.payload);
+      } else {
+        state.notes[state.selectedNote] = action.payload;
       }
     },
     addMeasure(state, action: PayloadAction<Note[]>) {
@@ -78,6 +78,9 @@ const musicDataSlice = createSlice({
     setTitle(state, action: PayloadAction<string>) {
       state.title = action.payload;
     },
+    setTempo(state, action: PayloadAction<string>) {
+      state.tempo = action.payload;
+    },
   },
   selectors: {
     getAllMusicData: (state: MusicDataState) => state,
@@ -89,6 +92,10 @@ const musicDataSlice = createSlice({
     getSelectedNote: (state: MusicDataState) => state.notes[state.selectedNote],
     getKeySignature: (state: MusicDataState) => state.keySignature,
     getTitle: (state: MusicDataState) => state.title,
+    getTempo: (state: MusicDataState) => state.tempo,
+  },
+  extraReducers: (builder) => {
+    builder.addCase(PURGE, () => defaultMusicData);
   },
 });
 
@@ -111,6 +118,7 @@ export const getMeasures = createSelector(
         currentMeasureValue = 0;
       }
     });
+
     return measures;
   },
 );
@@ -125,6 +133,7 @@ export const {
   setHoverNote,
   setKeySignature,
   setTitle,
+  setTempo,
 } = musicDataSlice.actions;
 export const {
   getAllMusicData,
@@ -136,6 +145,7 @@ export const {
   getHoverNote,
   getKeySignature,
   getTitle,
+  getTempo,
 } = musicDataSlice.selectors;
 
 export default musicDataSlice.reducer;
