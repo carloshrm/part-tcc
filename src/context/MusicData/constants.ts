@@ -70,7 +70,7 @@ export const defaultFontSettings: FontInfo = {
   style: "",
 };
 
-const TEMPO = {
+export const TEMPO = {
   24: "Larghissimo",
   40: "Adagissimo",
   41: "Largo",
