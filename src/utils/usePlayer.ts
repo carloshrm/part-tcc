@@ -8,7 +8,7 @@ import * as Tone from "tone";
 function UsePlayer() {
   const synthRef = useRef<Tone.PolySynth | null>(null);
   const { isMuted, volume, isPlaying, bpm } = useAppSelector(getAllPlayerSettings);
-  const { notes, timeSignature } = useAppSelector(getAllMusicData);
+  const { notes, timeSignature, selectedNote } = useAppSelector(getAllMusicData);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -39,9 +39,11 @@ function UsePlayer() {
     Tone.getTransport().bpm.value = bpm;
   }, [bpm]);
 
-  const playNote = (noteKeys: NoteKey[], noteValue: number) => {
-    const keys = noteKeys.map((note) => `${note.note}${note.octave}`);
-    synthRef.current?.triggerAttackRelease(keys, `${noteValue}n`);
+  const playNote = () => {
+    const currentNote = notes[selectedNote];
+
+    const keys = currentNote.keys.map((note) => `${note.note}${note.octave}`);
+    synthRef.current?.triggerAttackRelease(keys, `${currentNote.duration}n`);
   };
 
   const playMusic = () => {

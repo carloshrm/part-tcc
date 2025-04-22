@@ -22,8 +22,8 @@ function UseUtils() {
     });
   };
 
-  const makeEmptyMeasure = (timeSignature: TimeSignature, duration: number) => {
-    const notesPerBeat = duration / timeSignature.value;
+  const makeEmptyMeasure = (timeSignature: TimeSignature, duration: string) => {
+    const notesPerBeat = parseInt(duration) / timeSignature.value;
     return Array(timeSignature.beats * notesPerBeat).fill(RESTS[duration]);
   };
 
