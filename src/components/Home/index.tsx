@@ -1,16 +1,19 @@
-import Layout, { Footer, Header } from "antd/es/layout/layout";
+import { Footer } from "antd/es/layout/layout";
 import SheetMusic from "../SheetMusic";
 import * as S from "./styles";
 
 function Home() {
   return (
-    <Layout>
-      <Header>
+    <S.MainLayout>
+      <S.Header>
         <S.Title>Editor de partituras</S.Title>
-      </Header>
+      </S.Header>
       <SheetMusic />
-      <Footer>Abcd</Footer>
-    </Layout>
+      <Footer>
+        TCC Desenvolvido por Carlos H. R. Moraes - Sistemas de Informação UFU-MC, 2025. Código disponível em:{" "}
+        <a href="https://github.com/carloshrm/part-tcc">https://github.com/carloshrm/part-tcc</a>{" "}
+      </Footer>
+    </S.MainLayout>
   );
 }
 
