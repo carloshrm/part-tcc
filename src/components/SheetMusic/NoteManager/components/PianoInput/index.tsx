@@ -1,5 +1,6 @@
 import { musicNotes } from "@/context/MusicData/constants";
 import { NoteKey } from "@/context/MusicData/types";
+import { Button } from "antd";
 import { useState } from "react";
 import { NoteInputProps } from "../NoteInput";
 import * as S from "./styles";
@@ -69,14 +70,19 @@ function PianoInput({ noteInputState, noteSetter }: NoteInputProps) {
   );
 
   return expanded ? (
-    <S.PianoModal title={"Piano"} open={expanded} onOk={() => setExpanded(false)} onCancel={() => setExpanded(false)}>
+    <S.PianoModal>
+      <div>
+        <Button type="default" onClick={() => setExpanded(false)}>
+          Fechar
+        </Button>
+      </div>
       {pianoContent}
     </S.PianoModal>
   ) : (
-    <>
-      <S.ExpandButton onClick={() => setExpanded(true)}>//</S.ExpandButton>
+    <S.Container>
+      <S.ExpandButton onClick={() => setExpanded(true)}>Expandir {"\u2922"}</S.ExpandButton>
       {pianoContent}
-    </>
+    </S.Container>
   );
 }
 

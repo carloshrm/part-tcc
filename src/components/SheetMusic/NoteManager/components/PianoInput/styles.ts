@@ -1,12 +1,17 @@
-import { Button, Modal } from "antd";
+import { Button } from "antd";
 import styled, { css } from "styled-components";
+
+export const Container = styled.div`
+  max-width: 28rem;
+`;
 
 export const PianoContainer = styled.div<{ $expanded: boolean }>`
   padding: 1rem;
   display: flex;
   justify-content: center;
-  width: ${({ $expanded }) => ($expanded ? "100%" : "30vw")};
+  width: ${({ $expanded }) => ($expanded ? "100%" : "30rem")};
   overflow: auto;
+  margin: 0 auto;
 `;
 
 export const KeyContainer = styled.div`
@@ -51,18 +56,22 @@ export const BlackKey = styled.button<{ $isSelected?: boolean }>`
 export const ExpandButton = styled(Button).attrs({
   type: "default",
 })`
-  background-color: red;
+  font-size: 1.2rem;
+  text-align: center;
+  align-self: flex-end;
 `;
 
-export const PianoModal = styled(Modal).attrs({
-  title: "Piano",
-  width: {
-    md: "100%",
-    lg: "80%",
-    xl: "80%",
-    xxl: "70%",
-  },
-  footer: null,
-})`
-  top: 60%;
+export const PianoModal = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: fit-content;
+  padding: 1rem;
+  top: 82%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid ${({ theme }) => theme.colors.highlightBackground};
+  position: fixed;
+  background-color: ${({ theme }) => theme.colors.lightBackground};
+  z-index: 1;
 `;
