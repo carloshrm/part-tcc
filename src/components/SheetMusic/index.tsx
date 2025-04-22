@@ -87,6 +87,8 @@ function SheetMusic() {
     context.setFont({ ...defaultFontSettings });
     const titleWidth = context.measureText(musicData.title).width;
     context.fillText(musicData.title, (containerRef.current.width - titleWidth) / 2, 60);
+    context.setFont({ ...defaultFontSettings, size: 14 });
+    context.fillText(musicData.tempo, containerRef.current.width * 0.06, 100);
 
     let currentStaveNotes: Note[] = [];
     let currentMeasureValue = 0;
@@ -96,54 +98,56 @@ function SheetMusic() {
     let indexControl = 0;
     const measureDuration = musicData.timeSignature.beats * (1 / musicData.timeSignature.value);
 
-    for (let i = 0; i < musicData.notes.length; i++) {
-      currentStaveNotes.push(musicData.notes[i]);
-      currentMeasureValue += 1 / parseInt(musicData.notes[i].duration);
+    try {
+      for (let i = 0; i < musicData.notes.length; i++) {
+        currentStaveNotes.push(musicData.notes[i]);
+        currentMeasureValue += 1 / parseInt(musicData.notes[i].duration);
 
-      if (Math.abs(currentMeasureValue - measureDuration) < 1e-6) {
-        if (measureCount % sheetDisplaySettings.maxMeasuresPerLine === 0) {
-          lineCount++;
-          lastMeasurePos = 0;
-          measureCount = 0;
-        }
-        const currentStave = new Stave(
-          lastMeasurePos === 0 ? sheetDisplaySettings.widthOffset : lastMeasurePos,
-          sheetDisplaySettings.heightOffset * lineCount,
-          sheetDisplaySettings.measureWidth,
-        );
-
-        if (measureCount === 0) {
-          currentStave.addClef(musicData.clef).addKeySignature(musicData.keySignature);
-          currentStave.addTimeSignature(timeSignatureToString(musicData.timeSignature));
-        }
-        const notes = mapNotesToVexflow(currentStaveNotes, musicData.clef);
-
-        const voice = new Voice({
-          num_beats: musicData.timeSignature.beats,
-          beat_value: musicData.timeSignature.value,
-        });
-
-        voice.addTickables(notes);
-        Accidental.applyAccidentals([voice], `C`);
-        currentStave.setContext(context).draw();
-        Formatter.FormatAndDraw(context, currentStave, notes, { auto_beam: true });
-        lastMeasurePos = currentStave.getNoteEndX();
-
-        const notePositions = notes.reduce((acc: { [key: number]: BoundingBox }, note) => {
-          const boundingBox = note.getBoundingBox();
-          if (indexControl === musicData.hoverNote) {
-            strokeNote(boundingBox, true);
+        if (Math.abs(currentMeasureValue - measureDuration) < 1e-6) {
+          if (measureCount % sheetDisplaySettings.maxMeasuresPerLine === 0) {
+            lineCount++;
+            lastMeasurePos = 0;
+            measureCount = 0;
           }
-          acc[indexControl++] = boundingBox;
-          return acc;
-        }, {});
-        setNoteCoords((prev) => ({ ...prev, ...notePositions }));
+          const currentStave = new Stave(
+            lastMeasurePos === 0 ? sheetDisplaySettings.widthOffset : lastMeasurePos,
+            sheetDisplaySettings.heightOffset * lineCount,
+            sheetDisplaySettings.measureWidth,
+          );
 
-        measureCount++;
-        currentMeasureValue = 0;
-        currentStaveNotes = [];
+          if (measureCount === 0) {
+            currentStave.addClef(musicData.clef).addKeySignature(musicData.keySignature);
+            currentStave.addTimeSignature(timeSignatureToString(musicData.timeSignature));
+          }
+          const notes = mapNotesToVexflow(currentStaveNotes, musicData.clef);
+
+          const voice = new Voice({
+            num_beats: musicData.timeSignature.beats,
+            beat_value: musicData.timeSignature.value,
+          });
+
+          voice.addTickables(notes);
+          Accidental.applyAccidentals([voice], `C`);
+          currentStave.setContext(context).draw();
+          Formatter.FormatAndDraw(context, currentStave, notes, { auto_beam: true });
+          lastMeasurePos = currentStave.getNoteEndX();
+
+          const notePositions = notes.reduce((acc: { [key: number]: BoundingBox }, note) => {
+            const boundingBox = note.getBoundingBox();
+            if (indexControl === musicData.hoverNote) {
+              strokeNote(boundingBox, true);
+            }
+            acc[indexControl++] = boundingBox;
+            return acc;
+          }, {});
+          setNoteCoords((prev) => ({ ...prev, ...notePositions }));
+
+          measureCount++;
+          currentMeasureValue = 0;
+          currentStaveNotes = [];
+        }
       }
-    }
+    } catch (error) {}
   }, [musicData]);
 
   return (
