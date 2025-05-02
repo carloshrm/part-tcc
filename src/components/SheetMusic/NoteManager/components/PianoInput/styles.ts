@@ -68,7 +68,7 @@ export const PianoModal = styled.div`
   width: fit-content;
   padding: 1rem;
   top: 82%;
-  left: 50%;
+  left: 66%;
   transform: translate(-50%, -50%);
   border: 2px solid ${({ theme }) => theme.colors.highlightBackground};
   position: fixed;
