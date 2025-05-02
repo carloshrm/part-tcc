@@ -48,16 +48,58 @@ const musicDataSlice = createSlice({
     setNote(state, action: PayloadAction<Note>) {
       const currentNoteDuration = parseInt(state.notes[state.selectedNote].duration);
       const newNoteDuration = parseInt(action.payload.duration);
+
+      const currentIsRest = state.notes[state.selectedNote].duration.includes("r");
+
       if (currentNoteDuration < newNoteDuration) {
         const splitNoteCount = newNoteDuration / currentNoteDuration;
         const fillNotes = Array(splitNoteCount).fill(RESTS[newNoteDuration]);
-        const deleteCount = state.notes[state.selectedNote].duration[1] === "r" ? 1 : 0;
         fillNotes[0] = action.payload;
 
-        state.notes.splice(state.selectedNote, deleteCount, ...fillNotes);
+        state.notes.splice(state.selectedNote, currentIsRest ? 1 : 0, ...fillNotes);
       } else if (currentNoteDuration > newNoteDuration) {
-        const deleteCount = currentNoteDuration / newNoteDuration;
-        state.notes.splice(state.selectedNote, deleteCount, action.payload);
+        const newNotes = [...state.notes];
+        newNotes.splice(state.selectedNote, 0, action.payload);
+
+        const measureDuration = state.timeSignature.beats * (1 / state.timeSignature.value);
+        let measureControl = 0;
+        let overflownControl: Note[] | undefined = undefined;
+
+        for (const note of newNotes) {
+          const currentnoteValue = 1 / parseInt(note.duration);
+
+          if (measureControl + currentnoteValue > measureDuration) {
+            const remainingValue = measureDuration - measureControl;
+            const overflown = currentnoteValue - remainingValue;
+
+            // TODO: convert to stavetie when implemented
+            const newIsRest = note.duration.includes("r");
+            const adjustedNote = { ...note, duration: `${1 / remainingValue}${newIsRest ? "r" : ""}` };
+            const overflownNote = { ...note, duration: `${1 / overflown}${newIsRest ? "r" : ""}` };
+            overflownControl = [adjustedNote, overflownNote];
+            measureControl = overflown;
+            continue;
+          } else {
+            measureControl += currentnoteValue;
+          }
+
+          if (Math.abs(measureControl - measureDuration) < 1e-6) {
+            measureControl = 0;
+          }
+        }
+
+        if (measureControl > 0) {
+          const noteValue = 1 / measureControl;
+          if (noteValue in RESTS) {
+            newNotes.push(RESTS[noteValue]);
+          }
+        }
+
+        if (overflownControl) {
+          newNotes.splice(state.selectedNote, 1, ...overflownControl);
+        }
+
+        state.notes = newNotes;
       } else {
         state.notes[state.selectedNote] = action.payload;
       }
