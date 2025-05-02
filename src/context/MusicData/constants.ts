@@ -18,11 +18,18 @@ export const RESTS: { [key: string]: Note } = {
   QUARTER: { keys: [{ note: "b", octave: 4 }], duration: "4r", voice: 1 },
   EIGHTH: { keys: [{ note: "b", octave: 4 }], duration: "8r", voice: 1 },
   SIXTEENTH: { keys: [{ note: "b", octave: 4 }], duration: "16r", voice: 1 },
-  1: { keys: [{ note: "b", octave: 4 }], duration: "1r", voice: 1 },
-  2: { keys: [{ note: "b", octave: 4 }], duration: "2r", voice: 1 },
-  4: { keys: [{ note: "b", octave: 4 }], duration: "4r", voice: 1 },
-  8: { keys: [{ note: "b", octave: 4 }], duration: "8r", voice: 1 },
-  16: { keys: [{ note: "b", octave: 4 }], duration: "16r", voice: 1 },
+  "1": { keys: [{ note: "b", octave: 4 }], duration: "1r", voice: 1 },
+  "2": { keys: [{ note: "b", octave: 4 }], duration: "2r", voice: 1 },
+  "4": { keys: [{ note: "b", octave: 4 }], duration: "4r", voice: 1 },
+  "8": { keys: [{ note: "b", octave: 4 }], duration: "8r", voice: 1 },
+  "16": { keys: [{ note: "b", octave: 4 }], duration: "16r", voice: 1 },
+  "32": { keys: [{ note: "b", octave: 4 }], duration: "32r", voice: 1 },
+  "3": { keys: [{ note: "b", octave: 4 }], duration: "1dr", voice: 1 },
+  "6": { keys: [{ note: "b", octave: 4 }], duration: "2dr", voice: 1 },
+  "12": { keys: [{ note: "b", octave: 4 }], duration: "4dr", voice: 1 },
+  "24": { keys: [{ note: "b", octave: 4 }], duration: "8dr", voice: 1 },
+  "48": { keys: [{ note: "b", octave: 4 }], duration: "16dr", voice: 1 },
+  "96": { keys: [{ note: "b", octave: 4 }], duration: "32dr", voice: 1 },
 };
 
 export const validTimeSignatureOptions = {
