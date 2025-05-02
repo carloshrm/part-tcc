@@ -8,7 +8,7 @@ import UseMusicSymbol from "@/utils/useMusicSymbol";
 import UsePlayer from "@/utils/usePlayer";
 import UseUtils from "@/utils/useUtils";
 import { Button, Radio, RadioChangeEvent, Switch, Tooltip } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import NoteInput from "./components/NoteInput";
 import PianoInput from "./components/PianoInput";
 import * as S from "./styles";
@@ -44,14 +44,10 @@ function NoteManager() {
     }
   }, [autoNext]);
 
-  useEffect(() => {
-    if (notes[selectedNote]) {
-      setTimeInput(notes[selectedNote].duration);
-      setRestInput(notes[selectedNote].duration.includes("r"));
-    }
-  }, []);
-
-  const keys = notes[selectedNote].duration.includes("r") ? [] : notes[selectedNote].keys;
+  const keys = useMemo(
+    () => (notes[selectedNote].duration.includes("r") ? [] : notes[selectedNote].keys),
+    [notes, selectedNote],
+  );
 
   const handleSetAccidental = (noteKey: NoteKey, accidental: string) => {
     if (noteKey.note[1] && (noteKey.note[1] === "#" || noteKey.note[1] === "b")) {
@@ -153,7 +149,7 @@ function NoteManager() {
             onChange={(e) => setInputType(e.target.value)}
           >
             <Radio.Button value={InputTypes.Notes}>Notas</Radio.Button>
-            <Radio.Button value={InputTypes.Piano}>Piano</Radio.Button>
+            <Radio.Button value={InputTypes.Piano}>Teclado</Radio.Button>
           </Radio.Group>
         </div>
 
@@ -180,7 +176,7 @@ function NoteManager() {
 
         <S.RestContainer>
           <S.ControlTitle>Pausa</S.ControlTitle>
-          <Switch defaultChecked onChange={handleRestToggle} />
+          <Switch defaultChecked onChange={handleRestToggle} value={!restInput} />
           <S.ControlTitle>Nota</S.ControlTitle>
         </S.RestContainer>
 
