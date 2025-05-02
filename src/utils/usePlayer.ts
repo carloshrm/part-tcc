@@ -41,6 +41,7 @@ function UsePlayer() {
 
   const playNote = () => {
     const currentNote = notes[selectedNote];
+    if (!currentNote || currentNote.duration.includes("r") || isMuted) return;
 
     const keys = currentNote.keys.map((note) => `${note.note}${note.octave}`);
     synthRef.current?.triggerAttackRelease(keys, `${currentNote.duration}n`);
