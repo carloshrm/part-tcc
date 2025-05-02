@@ -32,6 +32,13 @@ function NoteManager() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    if (notes[selectedNote]) {
+      setTimeInput(notes[selectedNote].duration.replace("r", ""));
+      setRestInput(notes[selectedNote].duration.includes("r"));
+    }
+  }, [notes, selectedNote]);
+
+  useEffect(() => {
     if (!autoNext && timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
