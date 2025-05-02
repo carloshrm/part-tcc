@@ -5,6 +5,8 @@ export const NoteControlCarousel = styled(Carousel).attrs({
   dots: true,
   dotPosition: "left",
   arrows: true,
+  infinite: true,
+  accessibility: false,
 })`
   width: 440px;
 `;

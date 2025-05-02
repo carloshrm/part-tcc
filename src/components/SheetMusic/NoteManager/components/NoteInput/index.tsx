@@ -1,5 +1,6 @@
 import { musicNotes, noteInputOctaves } from "@/context/MusicData/constants";
 import { NoteKey } from "@/context/MusicData/types";
+import UseHotkey from "@/utils/useHotkey";
 import { CarouselRef } from "antd/es/carousel";
 import { useEffect, useRef } from "react";
 import * as S from "./styles";
@@ -20,7 +21,10 @@ function NoteInput({ noteSetter, noteInputState, accSetter }: NoteInputProps) {
     if (carouselRef.current) {
       carouselRef.current.goTo(noteInputOctaves.indexOf(octaveAvg));
     }
-  }, []);
+  }, [noteInputState]);
+
+  UseHotkey("ArrowUp", () => carouselRef.current?.next());
+  UseHotkey("ArrowDown", () => carouselRef.current?.prev());
 
   return (
     <S.NoteControlCarousel ref={carouselRef}>
