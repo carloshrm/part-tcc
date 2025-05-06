@@ -15,7 +15,6 @@ function UseHotkey(
 
   useEffect(() => {
     const keyDownHandler = (e: KeyboardEvent) => {
-      e.preventDefault();
       if (e.key.toLowerCase() === key.toLowerCase()) {
         if ((withShift && !e.shiftKey) || (withAlt && !e.altKey) || (withCtrl && !e.ctrlKey)) {
           return;
