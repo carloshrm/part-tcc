@@ -49,14 +49,12 @@ const musicDataSlice = createSlice({
       const currentNoteDuration = parseInt(state.notes[state.selectedNote].duration);
       const newNoteDuration = parseInt(action.payload.duration);
 
-      const currentIsRest = state.notes[state.selectedNote].duration.includes("r");
-
       if (currentNoteDuration < newNoteDuration) {
         const splitNoteCount = newNoteDuration / currentNoteDuration;
         const fillNotes = Array(splitNoteCount).fill(RESTS[newNoteDuration]);
         fillNotes[0] = action.payload;
 
-        state.notes.splice(state.selectedNote, currentIsRest ? 1 : 0, ...fillNotes);
+        state.notes.splice(state.selectedNote, 1, ...fillNotes);
       } else if (currentNoteDuration > newNoteDuration) {
         const newNotes = [...state.notes];
         newNotes.splice(state.selectedNote, 0, action.payload);
