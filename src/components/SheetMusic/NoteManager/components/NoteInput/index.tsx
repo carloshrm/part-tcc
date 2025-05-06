@@ -15,9 +15,13 @@ function NoteInput({ noteSetter, noteInputState, accSetter }: NoteInputProps) {
   const carouselRef = useRef<CarouselRef>(null);
 
   useEffect(() => {
-    const octaveAvg = Math.round(
+    let octaveAvg = Math.round(
       noteInputState.reduce((octave, note) => octave + note.octave, 0) / noteInputState.length,
     );
+    if (isNaN(octaveAvg)) {
+      octaveAvg = 4;
+    }
+
     if (carouselRef.current) {
       carouselRef.current.goTo(noteInputOctaves.indexOf(octaveAvg));
     }
