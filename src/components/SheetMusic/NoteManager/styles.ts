@@ -22,7 +22,7 @@ export const RestContainer = styled.div`
 `;
 
 export const ControlTitle = styled(Typography.Title).attrs({ level: 4 })`
-  margin: 0;
+  margin: 0 !important;
 `;
 
 export const DurationRadio = styled(Radio.Group)``;
