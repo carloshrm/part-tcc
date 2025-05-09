@@ -16,3 +16,15 @@ export const SaveSelectContainer = styled.div`
   gap: 1rem;
   margin-bottom: 1rem;
 `;
+
+export const JSONContainer = styled.div`
+  border: ${({ theme }) => theme.border.defaultBorder};
+  padding: 1rem;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  button {
+    width: fit-content;
+  }
+`;

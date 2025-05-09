@@ -18,6 +18,13 @@ const playerSettingsSlice = createSlice({
     setBpm(state, action: PayloadAction<number>) {
       state.bpm = action.payload;
     },
+    setPlayerSettingsImportData(state, action: PayloadAction<PlayerSettingsState>) {
+      const { volume, isMuted, isPlaying, bpm } = action.payload;
+      state.volume = volume;
+      state.isMuted = isMuted;
+      state.isPlaying = isPlaying;
+      state.bpm = bpm;
+    },
   },
   selectors: {
     getAllPlayerSettings: (state: PlayerSettingsState) => state,
@@ -29,7 +36,7 @@ const playerSettingsSlice = createSlice({
   },
 });
 
-export const { setVolume, toggleMute, setIsPlaying, setBpm } = playerSettingsSlice.actions;
+export const { setVolume, toggleMute, setIsPlaying, setBpm, setPlayerSettingsImportData } = playerSettingsSlice.actions;
 
 export const { getAllPlayerSettings } = playerSettingsSlice.selectors;
 

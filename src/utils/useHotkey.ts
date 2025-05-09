@@ -19,7 +19,7 @@ function UseHotkey(
         if ((withShift && !e.shiftKey) || (withAlt && !e.altKey) || (withCtrl && !e.ctrlKey)) {
           return;
         }
-
+        e.preventDefault();
         callbackMemo();
       }
     };

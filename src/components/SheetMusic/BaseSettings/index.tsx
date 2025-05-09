@@ -1,18 +1,21 @@
 import ControlContainer from "@/components/ControlContainer";
 import { useAppDispatch, useAppSelector } from "@/context/hooks";
 import { SaveOptions } from "@/context/MusicData/constants";
-import { getTempo, getTitle, setTempo, setTitle } from "@/context/MusicData/musicDataSlice";
-import { persistor } from "@/context/store";
+import { setMusicImportData, setTempo, setTitle } from "@/context/MusicData/musicDataSlice";
+import { setPlayerSettingsImportData } from "@/context/Player/playerSettingsSlice";
+import { persistor, store } from "@/context/store";
 import useUtils from "@/utils/useUtils";
-import { Button, Input, Popconfirm, Select, Typography } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import { Button, Input, Popconfirm, Select, Typography, Upload } from "antd";
+import { RcFile } from "antd/es/upload";
 import { useState } from "react";
 import * as S from "./styles";
 
 function BaseSettings() {
   const [saveChoice, setSaveChoice] = useState<SaveOptions>(SaveOptions.PDF);
   const dispatch = useAppDispatch();
-  const title = useAppSelector(getTitle);
-  const tempo = useAppSelector(getTempo);
+  const storeState = useAppSelector((state) => state);
+  const { title, tempo } = storeState.musicData;
   const { saveAsPDF, saveAsPNG } = useUtils();
 
   const saveFunctionMap = { [SaveOptions.PDF]: saveAsPDF, [SaveOptions.PNG]: saveAsPNG, [SaveOptions.MIDI]: () => {} };
@@ -27,6 +30,37 @@ function BaseSettings() {
 
   const handleClear = () => {
     persistor.purge();
+  };
+
+  const handleExport = () => {
+    const stateToExport = JSON.stringify(storeState, null, 2);
+    const blob = new Blob([stateToExport], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${title || "music-data"}_partitura.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (file: RcFile) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result;
+      if (content) {
+        try {
+          const parsedData = JSON.parse(content as string);
+          store.dispatch(setMusicImportData(parsedData.musicData));
+          store.dispatch(setPlayerSettingsImportData(parsedData.playerSettings));
+        } catch (error) {
+          console.error("Failed to parse JSON file", error);
+        }
+      }
+    };
+    reader.readAsText(file);
+    return false;
   };
 
   return (
@@ -75,6 +109,16 @@ function BaseSettings() {
           Limpar
         </Button>
       </Popconfirm>
+      <S.JSONContainer>
+        <Typography.Title level={4}>Importar/Exportar JSON</Typography.Title>
+        <Upload accept=".json" beforeUpload={handleImport} showUploadList={false}>
+          <Button icon={<UploadOutlined />}>Importar JSON</Button>
+        </Upload>
+
+        <Button type="primary" onClick={handleExport}>
+          Exportar JSON
+        </Button>
+      </S.JSONContainer>
     </ControlContainer>
   );
 }

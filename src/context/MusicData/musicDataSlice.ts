@@ -121,6 +121,21 @@ const musicDataSlice = createSlice({
     setTempo(state, action: PayloadAction<string>) {
       state.tempo = action.payload;
     },
+    setMusicImportData(state, action: PayloadAction<MusicDataState>) {
+      const { clef, timeSignature, notes, selectedNote, hoverNote, keySignature, title, tempo } = action.payload;
+
+      state.clef = clef;
+      state.timeSignature = timeSignature;
+      state.notes = notes;
+      state.selectedNote = selectedNote;
+      state.hoverNote = hoverNote;
+      state.keySignature = keySignature;
+      state.title = title;
+      state.tempo = tempo;
+    },
+    setVoice(state, action: PayloadAction<number>) {
+      state.activeVoice = action.payload;
+    },
   },
   selectors: {
     getAllMusicData: (state: MusicDataState) => state,
@@ -133,6 +148,7 @@ const musicDataSlice = createSlice({
     getKeySignature: (state: MusicDataState) => state.keySignature,
     getTitle: (state: MusicDataState) => state.title,
     getTempo: (state: MusicDataState) => state.tempo,
+    getVoice: (state: MusicDataState) => state.activeVoice,
   },
   extraReducers: (builder) => {
     builder.addCase(PURGE, () => defaultMusicData);
@@ -174,6 +190,8 @@ export const {
   setKeySignature,
   setTitle,
   setTempo,
+  setMusicImportData,
+  setVoice,
 } = musicDataSlice.actions;
 export const {
   getAllMusicData,
@@ -186,6 +204,7 @@ export const {
   getKeySignature,
   getTitle,
   getTempo,
+  getVoice,
 } = musicDataSlice.selectors;
 
 export default musicDataSlice.reducer;

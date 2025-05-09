@@ -24,6 +24,7 @@ function NoteManager() {
   const [timeInput, setTimeInput] = useState<string>("4");
   const [restInput, setRestInput] = useState<boolean>(false);
   const [inputType, setInputType] = useState<InputTypes>(InputTypes.Notes);
+  const [voice, setVoice] = useState<number>(1);
   const [autoNext, setAutoNext] = useState<boolean>(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -35,8 +36,9 @@ function NoteManager() {
     if (notes[selectedNote]) {
       setTimeInput(notes[selectedNote].duration.replace("r", ""));
       setRestInput(notes[selectedNote].duration.includes("r"));
+      setVoice(notes[selectedNote].voice);
     }
-  }, [notes, selectedNote]);
+  }, [notes, selectedNote, voice]);
 
   useEffect(() => {
     if (!autoNext && timeoutRef.current) {
@@ -46,7 +48,7 @@ function NoteManager() {
 
   const keys = useMemo(
     () => (notes[selectedNote].duration.includes("r") ? [] : notes[selectedNote].keys),
-    [notes, selectedNote],
+    [notes, selectedNote, voice],
   );
 
   const handleSetAccidental = (noteKey: NoteKey, accidental: string) => {
@@ -61,9 +63,8 @@ function NoteManager() {
   };
 
   const handleSetNoteInput = (noteKey: NoteKey, deselect: boolean) => {
-    if (restInput) {
-      return;
-    }
+    setRestInput(false);
+
     let currentKeys: NoteKey[] = keys;
     if (deselect) {
       currentKeys = currentKeys.filter((key) => !(key.note === noteKey.note && key.octave === noteKey.octave));
@@ -93,6 +94,10 @@ function NoteManager() {
         }
         dispatch(setSelectedNote(nextSelectedNote));
       }, 2500);
+    }
+
+    if (selectedNote + 1 >= notes.length) {
+      dispatch(addMeasure(makeEmptyMeasure(timeSignature, timeInput)));
     }
   };
 
@@ -138,6 +143,11 @@ function NoteManager() {
 
   UseHotkey("ArrowLeft", () => handleMoveSelection(-1));
   UseHotkey("ArrowRight", () => handleMoveSelection(1));
+  UseHotkey("!", () => setTimeInput("2"), { withShift: true });
+  UseHotkey("@", () => setTimeInput("4"), { withShift: true });
+  UseHotkey("#", () => setTimeInput("8"), { withShift: true });
+  UseHotkey("$", () => setTimeInput("16"), { withShift: true });
+  UseHotkey("Delete", () => handleRestToggle(false));
 
   return (
     <>
@@ -176,7 +186,12 @@ function NoteManager() {
 
         <S.RestContainer>
           <S.ControlTitle>Pausa</S.ControlTitle>
-          <Switch defaultChecked onChange={handleRestToggle} value={!restInput} />
+          <Switch
+            defaultChecked
+            onChange={handleRestToggle}
+            value={!restInput}
+            aria-label="Ativar ou desativar entrada de pausa"
+          />
           <S.ControlTitle>Nota</S.ControlTitle>
         </S.RestContainer>
 
@@ -184,16 +199,24 @@ function NoteManager() {
           <S.ControlTitle>Duração</S.ControlTitle>
           <S.DurationRadio value={timeInput} buttonStyle="solid" onChange={handleDurationChange}>
             <Tooltip title={"Mínima"}>
-              <S.DurationOption value={"2"}>{UseMusicSymbol("2", "SMALL")}</S.DurationOption>
+              <S.DurationOption aria-label="Duração de mínima" value={"2"}>
+                {UseMusicSymbol("2", "SMALL")}
+              </S.DurationOption>
             </Tooltip>
             <Tooltip title={"Semínima"}>
-              <S.DurationOption value={"4"}>{UseMusicSymbol("4", "SMALL")}</S.DurationOption>
+              <S.DurationOption aria-label="Duração de semínima" value={"4"}>
+                {UseMusicSymbol("4", "SMALL")}
+              </S.DurationOption>
             </Tooltip>
             <Tooltip title={"Colcheia"}>
-              <S.DurationOption value={"8"}>{UseMusicSymbol("8", "SMALL")}</S.DurationOption>
+              <S.DurationOption aria-label="Duração de colcheia" value={"8"}>
+                {UseMusicSymbol("8", "SMALL")}
+              </S.DurationOption>
             </Tooltip>
             <Tooltip title={"Semicolcheia"}>
-              <S.DurationOption value={"16"}>{UseMusicSymbol("16", "SMALL")}</S.DurationOption>
+              <S.DurationOption aria-label="Duração de semicolcheia" value={"16"}>
+                {UseMusicSymbol("16", "SMALL")}
+              </S.DurationOption>
             </Tooltip>
           </S.DurationRadio>
         </S.DurationContainer>

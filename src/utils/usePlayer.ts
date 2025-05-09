@@ -51,28 +51,47 @@ function UsePlayer() {
     stopPlayer();
     if (notes.length === 0 || isMuted) return;
 
-    const music = new Tone.Sequence((time, note) => {
-      if (note && !note.duration.includes("r")) {
-        const noteKeys = note.keys.map((key: NoteKey) => `${key.note}${key.octave}`);
-        synthRef.current?.triggerAttackRelease(noteKeys, `${note.duration}n`, time);
-      }
-    }, notes);
-
     Tone.getTransport().timeSignature = [timeSignature.beats, timeSignature.value];
+    Tone.getTransport().bpm.value = bpm;
 
-    music.loop = false;
-    const duration = notes.reduce((acc, note) => {
-      const noteDuration = note.duration.replace(`r`, "");
-      const duration = Tone.Time(`${noteDuration}n`).toSeconds();
-      return acc + duration;
-    }, 0);
+    let currentTime = 0;
+    const events: Array<[number, any]> = [];
 
-    music.start(0);
+    for (const note of notes) {
+      const durationValue = note.duration.replace("r", "");
+      const toneDuration = `${durationValue}n`;
+
+      if (!note.duration.includes("r")) {
+        // Playable note
+        events.push([
+          currentTime,
+          {
+            keys: note.keys.map((key: NoteKey) => `${key.note}${key.octave}`),
+            duration: toneDuration,
+          },
+        ]);
+      }
+
+      // Advance time regardless of rest or note
+      currentTime += Tone.Time(toneDuration).toSeconds();
+    }
+
+    const part = new Tone.Part((time, value) => {
+      if (value) {
+        synthRef.current?.triggerAttackRelease(value.keys, value.duration, time);
+      }
+    }, events);
+
+    part.start(0);
+    part.loop = false;
+
     Tone.getTransport().start();
+
+    // Stop after total duration
     Tone.getTransport().scheduleOnce(() => {
-      music.stop();
+      part.stop();
       stopPlayer();
-    }, duration);
+    }, currentTime);
   };
 
   const stopPlayer = () => {

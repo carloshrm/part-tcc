@@ -4,7 +4,7 @@ export const ControlFieldset = styled.fieldset<{ $scroll: boolean; $collapsed: b
   margin: 1rem;
   padding: ${({ $collapsed }) => ($collapsed ? "0 1rem" : "1rem")};
 
-  width: ${({ $collapsed }) => ($collapsed ? "32%" : "30rem")};
+  width: ${({ $collapsed }) => ($collapsed ? "10rem" : "30rem")};
 
   overflow: ${({ $scroll, $collapsed }) => (!$scroll || $collapsed ? "hidden" : "scroll")};
   height: ${({ $scroll, $collapsed }) => {

@@ -12,7 +12,7 @@ function Home() {
         <p>TCC Desenvolvido por Carlos H. R. Moraes - Sistemas de Informação UFU-MC, 2025.</p>
         <p>
           Código disponível em:{" "}
-          <a href="https://github.com/carloshrm/part-tcc">https://github.com/carloshrm/part-tcc</a>
+          <S.Link href="https://github.com/carloshrm/part-tcc">https://github.com/carloshrm/part-tcc</S.Link>
         </p>
       </S.Footer>
     </S.MainLayout>

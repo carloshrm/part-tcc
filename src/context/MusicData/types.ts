@@ -25,6 +25,7 @@ export interface MusicDataState {
   keySignature: string;
   title: string;
   tempo: string;
+  activeVoice: number;
 }
 
 export const defaultMusicData: MusicDataState = {
@@ -34,6 +35,7 @@ export const defaultMusicData: MusicDataState = {
     beats: 4,
     value: 4,
   },
+  activeVoice: 0,
   keySignature: "C",
   selectedNote: 0,
   hoverNote: 0,

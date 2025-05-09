@@ -20,3 +20,11 @@ export const Footer = styled(Layout.Footer)`
   background-color: ${({ theme }) => theme.colors.highlightBackground};
   color: ${({ theme }) => theme.colors.highlightText};
 `;
+
+export const Link = styled.a`
+  color: ${({ theme }) => theme.colors.linkColor};
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
